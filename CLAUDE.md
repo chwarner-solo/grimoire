@@ -225,5 +225,7 @@ Source prevents infinite sync loops between Obsidian, Foundry, and Grimoire.
 | ADR-005 | ndjson Over Parquet for Event Storage |
 | ADR-006 | Typed UUIDs for All Identity |
 | ADR-007 | GrimoireID Base Struct via Embedding |
+| ADR-008 | GraphQL API Layer |
+| ADR-009 | Bidirectional Event Mapping |
 
 See `docs/adr/` for full records.

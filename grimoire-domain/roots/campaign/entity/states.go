@@ -1,6 +1,9 @@
 package entity
 
-import "github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
+import (
+	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/event"
+	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
+)
 
 // Campaign is the sealed interface for the Campaign aggregate root.
 // The unexported isCampaign() marker prevents external implementations.
@@ -9,6 +12,7 @@ type Campaign interface {
 	CampaignID() identity.CampaignID
 	CampaignName() string
 	Snapshot() CampaignSnapshot
+	Handle(evt event.Event) (Campaign, error)
 }
 
 // NewCampaign represents a campaign that has just been created.

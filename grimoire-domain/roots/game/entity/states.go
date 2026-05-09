@@ -1,6 +1,9 @@
 package entity
 
-import "github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
+import (
+	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/event"
+	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
+)
 
 // Game is the sealed interface for the Game aggregate root.
 // The unexported isGame() marker prevents external implementations.
@@ -9,6 +12,7 @@ type Game interface {
 	GameID() identity.GameID
 	GameName() string
 	Snapshot() GameSnapshot
+	Handle(evt event.Event) (Game, error)
 }
 
 // NewGame represents a game that has just been created.

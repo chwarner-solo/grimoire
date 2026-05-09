@@ -11,4 +11,5 @@ var (
 	ErrCampaignAlreadyLinked = errors.New("game: campaign already linked")
 	ErrCampaignNotLinked     = errors.New("game: campaign not linked")
 	ErrInvalidGameState      = errors.New("game: invalid state")
+	ErrUnexpectedEvent       = errors.New("game: unexpected event for current state")
 )

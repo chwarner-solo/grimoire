@@ -1,6 +1,9 @@
 package entity
 
-import "github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
+import (
+	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/event"
+	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
+)
 
 // Session is the sealed base interface for all session states.
 type Session interface {
@@ -8,6 +11,7 @@ type Session interface {
 	SessionID() identity.SessionID
 	CampaignID() identity.CampaignID
 	Snapshot() SessionSnapshot
+	Handle(evt event.Event) (Session, error)
 }
 
 // NewSession represents a session that has been created but not yet started.
