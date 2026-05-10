@@ -157,7 +157,7 @@ func TestHandle_ActiveCampaign_SessionEnded_TransitionsToIdle(t *testing.T) {
 func TestHandle_ActiveCampaign_UnexpectedEvent_ReturnsError(t *testing.T) {
 	c := activeCampaignForHandle(t)
 	_, err := c.Handle(event.EntityCreated{
-		EntityID: identity.NewNarrativeID().String(), EntityType: "narrative",
+		EntityID: identity.NewMasterNarrativeID().String(), EntityType: "master_narrative",
 		Name: "Lore", Source: event.SourceGrimoire,
 	})
 	if !errors.Is(err, entity.ErrUnexpectedEvent) {

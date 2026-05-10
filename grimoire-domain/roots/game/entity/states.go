@@ -11,21 +11,21 @@ type Game interface {
 	isGame()
 	GameID() identity.GameID
 	GameName() string
+	MasterNarrativeID() identity.MasterNarrativeID
 	Snapshot() GameSnapshot
 	Handle(evt event.Event) (Game, error)
 }
 
 // NewGame represents a game that has just been created.
-// The only valid transition is adding a narrative element, which moves to Draft.
+// The only valid transition is receiving a MasterNarrative creation, which moves to Draft.
 type NewGame interface {
 	Game
-	AddNarrativeElement(id identity.NarrativeID, name string, source event.Source) (DraftGame, []event.Event, error)
+	OnNarrativeCreated(id identity.MasterNarrativeID) (DraftGame, error)
 }
 
 // DraftGame represents a game that has narrative content but no active campaigns.
 type DraftGame interface {
 	Game
-	AddNarrativeElement(id identity.NarrativeID, name string, source event.Source) (DraftGame, []event.Event, error)
 	LinkCampaign(id identity.CampaignID, source event.Source) (DraftGame, []event.Event, error)
 	ActivateFromCampaign(id identity.CampaignID) (ActiveGame, error)
 }

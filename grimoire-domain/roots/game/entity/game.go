@@ -11,13 +11,15 @@ import (
 type gameCore struct {
 	id                  identity.GameID
 	name                string
+	masterNarrativeID   identity.MasterNarrativeID
 	campaignIDs         []identity.CampaignID
 	activeCampaignCount int
 }
 
-func (c *gameCore) GameID() identity.GameID   { return c.id }
-func (c *gameCore) GameName() string          { return c.name }
-func (c *gameCore) isGame()                   {}
+func (c *gameCore) GameID() identity.GameID                       { return c.id }
+func (c *gameCore) GameName() string                              { return c.name }
+func (c *gameCore) MasterNarrativeID() identity.MasterNarrativeID { return c.masterNarrativeID }
+func (c *gameCore) isGame()                                       {}
 
 func (c *gameCore) hasCampaign(id identity.CampaignID) bool {
 	for _, cid := range c.campaignIDs {
@@ -34,6 +36,7 @@ func (c *gameCore) snapshot(state string) GameSnapshot {
 	return GameSnapshot{
 		ID:                  c.id,
 		Name:                c.name,
+		MasterNarrativeID:   c.masterNarrativeID,
 		State:               state,
 		CampaignIDs:         ids,
 		ActiveCampaignCount: c.activeCampaignCount,

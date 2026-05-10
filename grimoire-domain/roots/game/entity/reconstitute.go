@@ -10,6 +10,7 @@ import (
 type GameSnapshot struct {
 	ID                  identity.GameID
 	Name                string
+	MasterNarrativeID   identity.MasterNarrativeID
 	State               string
 	CampaignIDs         []identity.CampaignID
 	ActiveCampaignCount int
@@ -21,6 +22,7 @@ func ReconstituteGame(snap GameSnapshot) (Game, error) {
 	core := gameCore{
 		id:                  snap.ID,
 		name:                snap.Name,
+		masterNarrativeID:   snap.MasterNarrativeID,
 		campaignIDs:         snap.CampaignIDs,
 		activeCampaignCount: snap.ActiveCampaignCount,
 	}

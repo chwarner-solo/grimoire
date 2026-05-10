@@ -25,9 +25,10 @@ func TestReconstituteGame_NewState(t *testing.T) {
 
 func TestReconstituteGame_DraftState(t *testing.T) {
 	snap := GameSnapshot{
-		ID:    identity.NewGameID(),
-		Name:  "Test Game",
-		State: "draft",
+		ID:                identity.NewGameID(),
+		Name:              "Test Game",
+		MasterNarrativeID: identity.NewMasterNarrativeID(),
+		State:             "draft",
 	}
 	g, err := ReconstituteGame(snap)
 	if err != nil {
@@ -43,6 +44,7 @@ func TestReconstituteGame_ActiveState(t *testing.T) {
 	snap := GameSnapshot{
 		ID:                  identity.NewGameID(),
 		Name:                "Test Game",
+		MasterNarrativeID:   identity.NewMasterNarrativeID(),
 		State:               "active",
 		CampaignIDs:         []identity.CampaignID{cid},
 		ActiveCampaignCount: 1,
@@ -58,10 +60,11 @@ func TestReconstituteGame_ActiveState(t *testing.T) {
 
 func TestReconstituteGame_IdleState(t *testing.T) {
 	snap := GameSnapshot{
-		ID:          identity.NewGameID(),
-		Name:        "Test Game",
-		State:       "idle",
-		CampaignIDs: []identity.CampaignID{identity.NewCampaignID()},
+		ID:                identity.NewGameID(),
+		Name:              "Test Game",
+		MasterNarrativeID: identity.NewMasterNarrativeID(),
+		State:             "idle",
+		CampaignIDs:       []identity.CampaignID{identity.NewCampaignID()},
 	}
 	g, err := ReconstituteGame(snap)
 	if err != nil {
@@ -74,9 +77,10 @@ func TestReconstituteGame_IdleState(t *testing.T) {
 
 func TestReconstituteGame_ArchivedState(t *testing.T) {
 	snap := GameSnapshot{
-		ID:    identity.NewGameID(),
-		Name:  "Test Game",
-		State: "archived",
+		ID:                identity.NewGameID(),
+		Name:              "Test Game",
+		MasterNarrativeID: identity.NewMasterNarrativeID(),
+		State:             "archived",
 	}
 	g, err := ReconstituteGame(snap)
 	if err != nil {
@@ -102,7 +106,8 @@ func TestReconstituteGame_UnknownState_ReturnsError(t *testing.T) {
 func TestReconstituteGame_RoundTrip(t *testing.T) {
 	// Create → Draft → snapshot → reconstitute → snapshot → compare
 	ng, _, _ := CreateGame(identity.NewGameID(), "Round Trip Game", event.SourceGrimoire)
-	dg, _, _ := ng.AddNarrativeElement(identity.NewNarrativeID(), "Chapter 1", event.SourceGrimoire)
+	mnID := identity.NewMasterNarrativeID()
+	dg, _ := ng.OnNarrativeCreated(mnID)
 	cid := identity.NewCampaignID()
 	dg, _, _ = dg.LinkCampaign(cid, event.SourceGrimoire)
 
@@ -120,6 +125,9 @@ func TestReconstituteGame_RoundTrip(t *testing.T) {
 	}
 	if snap1.Name != snap2.Name {
 		t.Fatal("Name mismatch after round trip")
+	}
+	if snap1.MasterNarrativeID.String() != snap2.MasterNarrativeID.String() {
+		t.Fatal("MasterNarrativeID mismatch after round trip")
 	}
 	if snap1.State != snap2.State {
 		t.Fatal("State mismatch after round trip")
@@ -140,6 +148,7 @@ func TestReconstituteGame_ActiveWithMultipleCampaigns_StaysActiveAfterOneIdle(t 
 	snap := GameSnapshot{
 		ID:                  identity.NewGameID(),
 		Name:                "Multi Campaign",
+		MasterNarrativeID:   identity.NewMasterNarrativeID(),
 		State:               "active",
 		CampaignIDs:         []identity.CampaignID{c1, c2},
 		ActiveCampaignCount: 2,
@@ -161,10 +170,11 @@ func TestReconstituteGame_ActiveWithMultipleCampaigns_StaysActiveAfterOneIdle(t 
 func TestReconstituteGame_ReconstitutedDraft_CanTransition(t *testing.T) {
 	cid := identity.NewCampaignID()
 	snap := GameSnapshot{
-		ID:          identity.NewGameID(),
-		Name:        "Draft Game",
-		State:       "draft",
-		CampaignIDs: []identity.CampaignID{cid},
+		ID:                identity.NewGameID(),
+		Name:              "Draft Game",
+		MasterNarrativeID: identity.NewMasterNarrativeID(),
+		State:             "draft",
+		CampaignIDs:       []identity.CampaignID{cid},
 	}
 	g, _ := ReconstituteGame(snap)
 	dg := g.(DraftGame)

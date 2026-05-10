@@ -22,7 +22,7 @@ func mustCreateNewGame(t *testing.T) NewGame {
 func mustReachDraft(t *testing.T) DraftGame {
 	t.Helper()
 	ng := mustCreateNewGame(t)
-	dg, _, err := ng.AddNarrativeElement(identity.NewNarrativeID(), "The Fall of Kael", event.SourceGrimoire)
+	dg, err := ng.OnNarrativeCreated(identity.NewMasterNarrativeID())
 	if err != nil {
 		t.Fatalf("mustReachDraft: %v", err)
 	}
@@ -95,9 +95,9 @@ func TestCreateGame_ValidInputs_ReturnsNewGame(t *testing.T) {
 
 // --- NewGame state tests ---
 
-func TestNewGame_AddNarrativeElement_TransitionsToDraft(t *testing.T) {
+func TestNewGame_OnNarrativeCreated_TransitionsToDraft(t *testing.T) {
 	ng := mustCreateNewGame(t)
-	dg, _, err := ng.AddNarrativeElement(identity.NewNarrativeID(), "The Fall of Kael", event.SourceGrimoire)
+	dg, err := ng.OnNarrativeCreated(identity.NewMasterNarrativeID())
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -106,34 +106,27 @@ func TestNewGame_AddNarrativeElement_TransitionsToDraft(t *testing.T) {
 	}
 }
 
-func TestNewGame_AddNarrativeElement_RequiresNonZeroID(t *testing.T) {
+func TestNewGame_OnNarrativeCreated_RequiresNonZeroID(t *testing.T) {
 	ng := mustCreateNewGame(t)
-	_, _, err := ng.AddNarrativeElement(identity.NarrativeID{}, "The Fall of Kael", event.SourceGrimoire)
-	if !errors.Is(err, ErrNarrativeIDRequired) {
-		t.Fatalf("expected ErrNarrativeIDRequired, got: %v", err)
+	_, err := ng.OnNarrativeCreated(identity.MasterNarrativeID{})
+	if !errors.Is(err, ErrMasterNarrativeIDRequired) {
+		t.Fatalf("expected ErrMasterNarrativeIDRequired, got: %v", err)
 	}
 }
 
-func TestNewGame_AddNarrativeElement_RequiresNonEmptyName(t *testing.T) {
+func TestNewGame_OnNarrativeCreated_StoresMasterNarrativeID(t *testing.T) {
 	ng := mustCreateNewGame(t)
-	_, _, err := ng.AddNarrativeElement(identity.NewNarrativeID(), "", event.SourceGrimoire)
-	if !errors.Is(err, ErrNarrativeNameRequired) {
-		t.Fatalf("expected ErrNarrativeNameRequired, got: %v", err)
+	mnID := identity.NewMasterNarrativeID()
+	dg, err := ng.OnNarrativeCreated(mnID)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if dg.MasterNarrativeID().String() != mnID.String() {
+		t.Fatalf("expected MasterNarrativeID %s, got %s", mnID.String(), dg.MasterNarrativeID().String())
 	}
 }
 
 // --- DraftGame state tests ---
-
-func TestDraftGame_AddNarrativeElement_StaysDraft(t *testing.T) {
-	dg := mustReachDraft(t)
-	dg2, _, err := dg.AddNarrativeElement(identity.NewNarrativeID(), "Act II", event.SourceGrimoire)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if dg2.Snapshot().State != "draft" {
-		t.Fatal("expected state to remain draft")
-	}
-}
 
 func TestDraftGame_LinkCampaign_Succeeds(t *testing.T) {
 	dg := mustReachDraft(t)
@@ -294,40 +287,6 @@ func TestCreateGame_ProducesEntityCreatedEvent(t *testing.T) {
 	}
 }
 
-func TestAddNarrativeElement_ProducesEntityCreatedEvent(t *testing.T) {
-	ng := mustCreateNewGame(t)
-	narID := identity.NewNarrativeID()
-	_, events, err := ng.AddNarrativeElement(narID, "The Fall of Kael", event.SourceFoundry)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if len(events) != 1 {
-		t.Fatalf("expected 1 event, got %d", len(events))
-	}
-	ec, ok := events[0].(event.EntityCreated)
-	if !ok {
-		t.Fatalf("expected EntityCreated, got %T", events[0])
-	}
-	if ec.EntityID != narID.String() {
-		t.Fatalf("expected entity ID %s, got %s", narID.String(), ec.EntityID)
-	}
-	if ec.EntityType != "narrative" {
-		t.Fatalf("expected entity type 'narrative', got %q", ec.EntityType)
-	}
-	if ec.Name != "The Fall of Kael" {
-		t.Fatalf("expected name 'The Fall of Kael', got %q", ec.Name)
-	}
-}
-
-func TestAddNarrativeElement_SourcePassedThrough(t *testing.T) {
-	ng := mustCreateNewGame(t)
-	_, events, _ := ng.AddNarrativeElement(identity.NewNarrativeID(), "Lore", event.SourceObsidian)
-	ec := events[0].(event.EntityCreated)
-	if ec.Source != event.SourceObsidian {
-		t.Fatalf("expected source obsidian, got %q", ec.Source)
-	}
-}
-
 func TestLinkCampaign_ProducesEntityLinkedEvent(t *testing.T) {
 	dg := mustReachDraft(t)
 	campID := identity.NewCampaignID()
@@ -374,53 +333,5 @@ func TestArchive_ProducesEntityUpdatedEvent(t *testing.T) {
 	}
 	if eu.NewValue != "archived" {
 		t.Fatalf("expected new value 'archived', got %q", eu.NewValue)
-	}
-}
-
-func TestAddNarrativeElement_Error_ProducesNoEvents(t *testing.T) {
-	ng := mustCreateNewGame(t)
-	_, events, err := ng.AddNarrativeElement(identity.NarrativeID{}, "Lore", event.SourceGrimoire)
-	if err == nil {
-		t.Fatal("expected error")
-	}
-	if events != nil {
-		t.Fatalf("expected nil events on error, got %d", len(events))
-	}
-}
-
-func TestGame_CommandEvents_RoundTrip_ThroughHandle(t *testing.T) {
-	gameID := identity.NewGameID()
-	narID := identity.NewNarrativeID()
-	campID := identity.NewCampaignID()
-
-	// Build state via commands, collecting events
-	g, evts, _ := CreateGame(gameID, "Round Trip", event.SourceGrimoire)
-	allEvents := evts
-
-	dg, evts, _ := g.AddNarrativeElement(narID, "Lore", event.SourceGrimoire)
-	allEvents = append(allEvents, evts...)
-
-	dg, evts, _ = dg.LinkCampaign(campID, event.SourceGrimoire)
-	allEvents = append(allEvents, evts...)
-
-	// Replay from events
-	replayed, err := ReplayGame(allEvents)
-	if err != nil {
-		t.Fatalf("replay error: %v", err)
-	}
-
-	// Compare snapshots
-	cmdSnap := dg.Snapshot()
-	replaySnap := replayed.Snapshot()
-
-	if cmdSnap.State != replaySnap.State {
-		t.Fatalf("state mismatch: command=%s, replay=%s", cmdSnap.State, replaySnap.State)
-	}
-	if cmdSnap.Name != replaySnap.Name {
-		t.Fatalf("name mismatch: command=%s, replay=%s", cmdSnap.Name, replaySnap.Name)
-	}
-	if len(cmdSnap.CampaignIDs) != len(replaySnap.CampaignIDs) {
-		t.Fatalf("campaign IDs length mismatch: command=%d, replay=%d",
-			len(cmdSnap.CampaignIDs), len(replaySnap.CampaignIDs))
 	}
 }

@@ -25,11 +25,13 @@ func newGameForHandle(t *testing.T) entity.Game {
 func draftGameForHandle(t *testing.T) entity.Game {
 	t.Helper()
 	g := newGameForHandle(t)
-	result, err := g.Handle(event.EntityCreated{
-		EntityID:   identity.NewNarrativeID().String(),
-		EntityType: "narrative",
-		Name:       "Lore Entry",
-		Source:     event.SourceGrimoire,
+	mnID := identity.NewMasterNarrativeID()
+	result, err := g.Handle(event.EntityUpdated{
+		EntityID: g.GameID().String(),
+		Field:    "master_narrative_id",
+		OldValue: "",
+		NewValue: mnID.String(),
+		Source:   event.SourceGrimoire,
 	})
 	if err != nil {
 		t.Fatalf("failed to reach draft: %v", err)
@@ -70,16 +72,16 @@ func idleGameForHandle(t *testing.T) entity.Game {
 
 // --- tests ---
 
-func TestHandle_NewGame_EntityCreated_TransitionsToDraft(t *testing.T) {
+func TestHandle_NewGame_EntityUpdated_MasterNarrativeID_TransitionsToDraft(t *testing.T) {
 	g := newGameForHandle(t)
-	evt := event.EntityCreated{
-		EntityID:   identity.NewNarrativeID().String(),
-		EntityType: "narrative",
-		Name:       "The Dark Forest",
-		Source:     event.SourceGrimoire,
-	}
-
-	result, err := g.Handle(evt)
+	mnID := identity.NewMasterNarrativeID()
+	result, err := g.Handle(event.EntityUpdated{
+		EntityID: g.GameID().String(),
+		Field:    "master_narrative_id",
+		OldValue: "",
+		NewValue: mnID.String(),
+		Source:   event.SourceGrimoire,
+	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -264,11 +266,13 @@ func TestHandle_Immutability_OriginalUnchanged(t *testing.T) {
 	g := newGameForHandle(t)
 	snapBefore := g.Snapshot()
 
-	_, err := g.Handle(event.EntityCreated{
-		EntityID:   identity.NewNarrativeID().String(),
-		EntityType: "narrative",
-		Name:       "Some Lore",
-		Source:     event.SourceGrimoire,
+	mnID := identity.NewMasterNarrativeID()
+	_, err := g.Handle(event.EntityUpdated{
+		EntityID: g.GameID().String(),
+		Field:    "master_narrative_id",
+		OldValue: "",
+		NewValue: mnID.String(),
+		Source:   event.SourceGrimoire,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -282,12 +286,13 @@ func TestHandle_Immutability_OriginalUnchanged(t *testing.T) {
 
 func TestReplayGame_FullLifecycle(t *testing.T) {
 	gameID := identity.NewGameID()
+	mnID := identity.NewMasterNarrativeID()
 	campID := identity.NewCampaignID()
 	sessID := identity.NewSessionID()
 
 	events := []event.Event{
 		event.EntityCreated{EntityID: gameID.String(), EntityType: "game", Name: "My Game", Source: event.SourceGrimoire},
-		event.EntityCreated{EntityID: identity.NewNarrativeID().String(), EntityType: "narrative", Name: "Lore", Source: event.SourceGrimoire},
+		event.EntityUpdated{EntityID: gameID.String(), Field: "master_narrative_id", OldValue: "", NewValue: mnID.String(), Source: event.SourceGrimoire},
 		event.EntityLinked{EntityAID: gameID.String(), EntityBID: campID.String(), Relationship: "campaign", Source: event.SourceGrimoire},
 		event.SessionStarted{SessionID: sessID.String(), CampaignID: campID.String(), Date: time.Now()},
 		event.SessionEnded{SessionID: sessID.String()},

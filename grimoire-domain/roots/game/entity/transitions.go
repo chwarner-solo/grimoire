@@ -7,33 +7,16 @@ import (
 
 // --- NewGame transitions ---
 
-func (g *newGame) AddNarrativeElement(id identity.NarrativeID, name string, source event.Source) (DraftGame, []event.Event, error) {
-	if err := validateNarrative(id, name); err != nil {
-		return nil, nil, err
+func (g *newGame) OnNarrativeCreated(id identity.MasterNarrativeID) (DraftGame, error) {
+	if id.IsZero() {
+		return nil, ErrMasterNarrativeIDRequired
 	}
-	evt := event.EntityCreated{
-		EntityID:   id.String(),
-		EntityType: "narrative",
-		Name:       name,
-		Source:     source,
-	}
-	return &draftGame{gameCore: g.gameCore}, []event.Event{evt}, nil
+	core := g.gameCore
+	core.masterNarrativeID = id
+	return &draftGame{gameCore: core}, nil
 }
 
 // --- DraftGame transitions ---
-
-func (g *draftGame) AddNarrativeElement(id identity.NarrativeID, name string, source event.Source) (DraftGame, []event.Event, error) {
-	if err := validateNarrative(id, name); err != nil {
-		return nil, nil, err
-	}
-	evt := event.EntityCreated{
-		EntityID:   id.String(),
-		EntityType: "narrative",
-		Name:       name,
-		Source:     source,
-	}
-	return g, []event.Event{evt}, nil
-}
 
 func (g *draftGame) LinkCampaign(id identity.CampaignID, source event.Source) (DraftGame, []event.Event, error) {
 	if err := validateCampaignID(id); err != nil {
@@ -122,16 +105,6 @@ func (g *idleGame) Archive(source event.Source) (ArchivedGame, []event.Event, er
 }
 
 // --- Helpers ---
-
-func validateNarrative(id identity.NarrativeID, name string) error {
-	if id.IsZero() {
-		return ErrNarrativeIDRequired
-	}
-	if len(name) == 0 {
-		return ErrNarrativeNameRequired
-	}
-	return nil
-}
 
 func validateCampaignID(id identity.CampaignID) error {
 	if id.IsZero() {

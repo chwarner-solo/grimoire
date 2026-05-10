@@ -89,23 +89,6 @@ func TestLocationID_NewIsNotZero(t *testing.T) {
 	}
 }
 
-func TestNarrativeID_NewAndParse_Roundtrip(t *testing.T) {
-	id := NewNarrativeID()
-	parsed, err := ParseNarrativeID(id.String())
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if parsed.String() != id.String() {
-		t.Fatalf("expected %s, got %s", id, parsed)
-	}
-}
-
-func TestNarrativeID_NewIsNotZero(t *testing.T) {
-	if NewNarrativeID().IsZero() {
-		t.Fatal("new NarrativeID should not be zero")
-	}
-}
-
 func TestFactionID_NewAndParse_Roundtrip(t *testing.T) {
 	id := NewFactionID()
 	parsed, err := ParseFactionID(id.String())
@@ -122,6 +105,200 @@ func TestFactionID_NewIsNotZero(t *testing.T) {
 		t.Fatal("new FactionID should not be zero")
 	}
 }
+
+func TestMasterNarrativeID_NewAndParse_Roundtrip(t *testing.T) {
+	id := NewMasterNarrativeID()
+	parsed, err := ParseMasterNarrativeID(id.String())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if parsed.String() != id.String() {
+		t.Fatalf("expected %s, got %s", id, parsed)
+	}
+}
+
+func TestMasterNarrativeID_NewIsNotZero(t *testing.T) {
+	if NewMasterNarrativeID().IsZero() {
+		t.Fatal("new MasterNarrativeID should not be zero")
+	}
+}
+
+func TestMasterNarrativeID_ZeroValue_IsZero(t *testing.T) {
+	var id MasterNarrativeID
+	if !id.IsZero() {
+		t.Fatal("zero-value MasterNarrativeID should be zero")
+	}
+}
+
+func TestCampaignNarrativeID_NewAndParse_Roundtrip(t *testing.T) {
+	id := NewCampaignNarrativeID()
+	parsed, err := ParseCampaignNarrativeID(id.String())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if parsed.String() != id.String() {
+		t.Fatalf("expected %s, got %s", id, parsed)
+	}
+}
+
+func TestCampaignNarrativeID_NewIsNotZero(t *testing.T) {
+	if NewCampaignNarrativeID().IsZero() {
+		t.Fatal("new CampaignNarrativeID should not be zero")
+	}
+}
+
+func TestCampaignNarrativeID_ZeroValue_IsZero(t *testing.T) {
+	var id CampaignNarrativeID
+	if !id.IsZero() {
+		t.Fatal("zero-value CampaignNarrativeID should be zero")
+	}
+}
+
+func TestBeatID_NewAndParse_Roundtrip(t *testing.T) {
+	id := NewBeatID()
+	parsed, err := ParseBeatID(id.String())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if parsed.String() != id.String() {
+		t.Fatalf("expected %s, got %s", id, parsed)
+	}
+}
+
+func TestBeatID_NewIsNotZero(t *testing.T) {
+	if NewBeatID().IsZero() {
+		t.Fatal("new BeatID should not be zero")
+	}
+}
+
+func TestBeatID_ZeroValue_IsZero(t *testing.T) {
+	var id BeatID
+	if !id.IsZero() {
+		t.Fatal("zero-value BeatID should be zero")
+	}
+}
+
+func TestActID_NewAndParse_Roundtrip(t *testing.T) {
+	id := NewActID()
+	parsed, err := ParseActID(id.String())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if parsed.String() != id.String() {
+		t.Fatalf("expected %s, got %s", id, parsed)
+	}
+}
+
+func TestActID_NewIsNotZero(t *testing.T) {
+	if NewActID().IsZero() {
+		t.Fatal("new ActID should not be zero")
+	}
+}
+
+func TestActID_ZeroValue_IsZero(t *testing.T) {
+	var id ActID
+	if !id.IsZero() {
+		t.Fatal("zero-value ActID should be zero")
+	}
+}
+
+func TestSecretID_NewAndParse_Roundtrip(t *testing.T) {
+	id := NewSecretID()
+	parsed, err := ParseSecretID(id.String())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if parsed.String() != id.String() {
+		t.Fatalf("expected %s, got %s", id, parsed)
+	}
+}
+
+func TestSecretID_NewIsNotZero(t *testing.T) {
+	if NewSecretID().IsZero() {
+		t.Fatal("new SecretID should not be zero")
+	}
+}
+
+func TestSecretID_ZeroValue_IsZero(t *testing.T) {
+	var id SecretID
+	if !id.IsZero() {
+		t.Fatal("zero-value SecretID should be zero")
+	}
+}
+
+func TestLoreID_NewAndParse_Roundtrip(t *testing.T) {
+	id := NewLoreID()
+	parsed, err := ParseLoreID(id.String())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if parsed.String() != id.String() {
+		t.Fatalf("expected %s, got %s", id, parsed)
+	}
+}
+
+func TestLoreID_NewIsNotZero(t *testing.T) {
+	if NewLoreID().IsZero() {
+		t.Fatal("new LoreID should not be zero")
+	}
+}
+
+func TestLoreID_ZeroValue_IsZero(t *testing.T) {
+	var id LoreID
+	if !id.IsZero() {
+		t.Fatal("zero-value LoreID should be zero")
+	}
+}
+
+func TestDecisionID_NewAndParse_Roundtrip(t *testing.T) {
+	id := NewDecisionID()
+	parsed, err := ParseDecisionID(id.String())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if parsed.String() != id.String() {
+		t.Fatalf("expected %s, got %s", id, parsed)
+	}
+}
+
+func TestDecisionID_NewIsNotZero(t *testing.T) {
+	if NewDecisionID().IsZero() {
+		t.Fatal("new DecisionID should not be zero")
+	}
+}
+
+func TestDecisionID_ZeroValue_IsZero(t *testing.T) {
+	var id DecisionID
+	if !id.IsZero() {
+		t.Fatal("zero-value DecisionID should be zero")
+	}
+}
+
+func TestRevelationID_NewAndParse_Roundtrip(t *testing.T) {
+	id := NewRevelationID()
+	parsed, err := ParseRevelationID(id.String())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if parsed.String() != id.String() {
+		t.Fatalf("expected %s, got %s", id, parsed)
+	}
+}
+
+func TestRevelationID_NewIsNotZero(t *testing.T) {
+	if NewRevelationID().IsZero() {
+		t.Fatal("new RevelationID should not be zero")
+	}
+}
+
+func TestRevelationID_ZeroValue_IsZero(t *testing.T) {
+	var id RevelationID
+	if !id.IsZero() {
+		t.Fatal("zero-value RevelationID should be zero")
+	}
+}
+
+// --- Parse error tests ---
 
 func TestParseGameID_InvalidInput_ReturnsError(t *testing.T) {
 	_, err := ParseGameID("not-valid")
@@ -158,15 +335,64 @@ func TestParseLocationID_InvalidInput_ReturnsError(t *testing.T) {
 	}
 }
 
-func TestParseNarrativeID_InvalidInput_ReturnsError(t *testing.T) {
-	_, err := ParseNarrativeID("not-valid")
+func TestParseFactionID_InvalidInput_ReturnsError(t *testing.T) {
+	_, err := ParseFactionID("not-valid")
 	if err == nil {
 		t.Fatal("expected error for invalid input")
 	}
 }
 
-func TestParseFactionID_InvalidInput_ReturnsError(t *testing.T) {
-	_, err := ParseFactionID("not-valid")
+func TestParseMasterNarrativeID_InvalidInput_ReturnsError(t *testing.T) {
+	_, err := ParseMasterNarrativeID("not-valid")
+	if err == nil {
+		t.Fatal("expected error for invalid input")
+	}
+}
+
+func TestParseCampaignNarrativeID_InvalidInput_ReturnsError(t *testing.T) {
+	_, err := ParseCampaignNarrativeID("not-valid")
+	if err == nil {
+		t.Fatal("expected error for invalid input")
+	}
+}
+
+func TestParseBeatID_InvalidInput_ReturnsError(t *testing.T) {
+	_, err := ParseBeatID("not-valid")
+	if err == nil {
+		t.Fatal("expected error for invalid input")
+	}
+}
+
+func TestParseActID_InvalidInput_ReturnsError(t *testing.T) {
+	_, err := ParseActID("not-valid")
+	if err == nil {
+		t.Fatal("expected error for invalid input")
+	}
+}
+
+func TestParseSecretID_InvalidInput_ReturnsError(t *testing.T) {
+	_, err := ParseSecretID("not-valid")
+	if err == nil {
+		t.Fatal("expected error for invalid input")
+	}
+}
+
+func TestParseLoreID_InvalidInput_ReturnsError(t *testing.T) {
+	_, err := ParseLoreID("not-valid")
+	if err == nil {
+		t.Fatal("expected error for invalid input")
+	}
+}
+
+func TestParseDecisionID_InvalidInput_ReturnsError(t *testing.T) {
+	_, err := ParseDecisionID("not-valid")
+	if err == nil {
+		t.Fatal("expected error for invalid input")
+	}
+}
+
+func TestParseRevelationID_InvalidInput_ReturnsError(t *testing.T) {
+	_, err := ParseRevelationID("not-valid")
 	if err == nil {
 		t.Fatal("expected error for invalid input")
 	}

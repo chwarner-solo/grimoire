@@ -40,8 +40,15 @@ type CampaignID struct{ GrimoireID }
 type SessionID struct{ GrimoireID }
 type CharacterID struct{ GrimoireID }
 type LocationID struct{ GrimoireID }
-type NarrativeID struct{ GrimoireID }
 type FactionID struct{ GrimoireID }
+type MasterNarrativeID struct{ GrimoireID }
+type CampaignNarrativeID struct{ GrimoireID }
+type BeatID struct{ GrimoireID }
+type ActID struct{ GrimoireID }
+type SecretID struct{ GrimoireID }
+type LoreID struct{ GrimoireID }
+type DecisionID struct{ GrimoireID }
+type RevelationID struct{ GrimoireID }
 
 func NewGameID() GameID {
 	return GameID{NewGrimoireID()}
@@ -103,18 +110,6 @@ func ParseLocationID(s string) (LocationID, error) {
 	return LocationID{base}, nil
 }
 
-func NewNarrativeID() NarrativeID {
-	return NarrativeID{NewGrimoireID()}
-}
-
-func ParseNarrativeID(s string) (NarrativeID, error) {
-	base, err := ParseGrimoireID(s)
-	if err != nil {
-		return NarrativeID{}, err
-	}
-	return NarrativeID{base}, nil
-}
-
 func NewFactionID() FactionID {
 	return FactionID{NewGrimoireID()}
 }
@@ -125,4 +120,100 @@ func ParseFactionID(s string) (FactionID, error) {
 		return FactionID{}, err
 	}
 	return FactionID{base}, nil
+}
+
+func NewMasterNarrativeID() MasterNarrativeID {
+	return MasterNarrativeID{NewGrimoireID()}
+}
+
+func ParseMasterNarrativeID(s string) (MasterNarrativeID, error) {
+	base, err := ParseGrimoireID(s)
+	if err != nil {
+		return MasterNarrativeID{}, err
+	}
+	return MasterNarrativeID{base}, nil
+}
+
+func NewCampaignNarrativeID() CampaignNarrativeID {
+	return CampaignNarrativeID{NewGrimoireID()}
+}
+
+func ParseCampaignNarrativeID(s string) (CampaignNarrativeID, error) {
+	base, err := ParseGrimoireID(s)
+	if err != nil {
+		return CampaignNarrativeID{}, err
+	}
+	return CampaignNarrativeID{base}, nil
+}
+
+func NewBeatID() BeatID {
+	return BeatID{NewGrimoireID()}
+}
+
+func ParseBeatID(s string) (BeatID, error) {
+	base, err := ParseGrimoireID(s)
+	if err != nil {
+		return BeatID{}, err
+	}
+	return BeatID{base}, nil
+}
+
+func NewActID() ActID {
+	return ActID{NewGrimoireID()}
+}
+
+func ParseActID(s string) (ActID, error) {
+	base, err := ParseGrimoireID(s)
+	if err != nil {
+		return ActID{}, err
+	}
+	return ActID{base}, nil
+}
+
+func NewSecretID() SecretID {
+	return SecretID{NewGrimoireID()}
+}
+
+func ParseSecretID(s string) (SecretID, error) {
+	base, err := ParseGrimoireID(s)
+	if err != nil {
+		return SecretID{}, err
+	}
+	return SecretID{base}, nil
+}
+
+func NewLoreID() LoreID {
+	return LoreID{NewGrimoireID()}
+}
+
+func ParseLoreID(s string) (LoreID, error) {
+	base, err := ParseGrimoireID(s)
+	if err != nil {
+		return LoreID{}, err
+	}
+	return LoreID{base}, nil
+}
+
+func NewDecisionID() DecisionID {
+	return DecisionID{NewGrimoireID()}
+}
+
+func ParseDecisionID(s string) (DecisionID, error) {
+	base, err := ParseGrimoireID(s)
+	if err != nil {
+		return DecisionID{}, err
+	}
+	return DecisionID{base}, nil
+}
+
+func NewRevelationID() RevelationID {
+	return RevelationID{NewGrimoireID()}
+}
+
+func ParseRevelationID(s string) (RevelationID, error) {
+	base, err := ParseGrimoireID(s)
+	if err != nil {
+		return RevelationID{}, err
+	}
+	return RevelationID{base}, nil
 }

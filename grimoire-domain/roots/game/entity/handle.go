@@ -11,10 +11,18 @@ import (
 // --- newGame Handle ---
 
 func (g *newGame) Handle(evt event.Event) (Game, error) {
-	switch evt.(type) {
-	case event.EntityCreated:
-		core := g.gameCore
-		return &draftGame{gameCore: core}, nil
+	switch e := evt.(type) {
+	case event.EntityUpdated:
+		if e.Field == "master_narrative_id" {
+			mnID, err := identity.ParseMasterNarrativeID(e.NewValue)
+			if err != nil {
+				return nil, fmt.Errorf("game handle: %w", err)
+			}
+			core := g.gameCore
+			core.masterNarrativeID = mnID
+			return &draftGame{gameCore: core}, nil
+		}
+		return nil, ErrUnexpectedEvent
 	default:
 		return nil, ErrUnexpectedEvent
 	}
@@ -24,9 +32,6 @@ func (g *newGame) Handle(evt event.Event) (Game, error) {
 
 func (g *draftGame) Handle(evt event.Event) (Game, error) {
 	switch e := evt.(type) {
-	case event.EntityCreated:
-		core := g.gameCore
-		return &draftGame{gameCore: core}, nil
 	case event.EntityLinked:
 		if e.Relationship != "campaign" {
 			return nil, ErrUnexpectedEvent
@@ -112,6 +117,7 @@ func (c *gameCore) copyCore() gameCore {
 	return gameCore{
 		id:                  c.id,
 		name:                c.name,
+		masterNarrativeID:   c.masterNarrativeID,
 		campaignIDs:         ids,
 		activeCampaignCount: c.activeCampaignCount,
 	}
