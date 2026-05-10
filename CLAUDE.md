@@ -140,7 +140,7 @@ CampaignNarrative →  a Campaign's path through the story DAG (Campaign-owned)
 Faction           →  groups, allegiances, goals
 ```
 
-The Narrative subsystem is two aggregates that collaborate (ADR-015):
+The Narrative subsystem is two aggregates that collaborate (ADR-016):
 - **MasterNarrative** — the GM's world truth, shared across all Campaigns
 - **CampaignNarrative** — one table's discoveries, decisions, and campaign-specific beats
 
@@ -281,6 +281,7 @@ type EventEnvelope struct {
 | ADR-012 | Event Sequencing |
 | ADR-013 | Four Module Workspace |
 | ADR-014 | Scaling Path — Firestore to Bigtable |
-| ADR-015 | Narrative as DAG — MasterNarrative + CampaignNarrative |
+| ADR-015 | ~~Narrative as DAG~~ (superseded by ADR-016) |
+| ADR-016 | Narrative Aggregate Architecture — Authoritative Record |
 
 See `docs/adr/` for full records.

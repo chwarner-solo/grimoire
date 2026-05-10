@@ -1,7 +1,7 @@
 # ADR-015: Narrative as a Directed Acyclic Graph — Neo4j for Relationships and Content, Firestore/Bigtable for Structure
 
 ## Status
-Accepted
+Superseded by ADR-016
 
 ## Date
 2026-05-10

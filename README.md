@@ -67,4 +67,5 @@ Design decisions are documented as ADRs in [`grimoire-domain/docs/adr/`](grimoir
 | [ADR-012](grimoire-domain/docs/adr/ADR-012_Event-Sequencing.md) | Event Sequencing |
 | [ADR-013](grimoire-domain/docs/adr/ADR-013_Four-Module-Workspace.md) | Four Module Workspace |
 | [ADR-014](grimoire-domain/docs/adr/ADR-014_Scaling_Path_BigTable.md) | Scaling Path — Firestore to Bigtable |
-| [ADR-015](grimoire-domain/docs/adr/ADR-015_Narrative-DAG.md) | Narrative as DAG — MasterNarrative + CampaignNarrative |
+| [ADR-015](grimoire-domain/docs/adr/ADR-015_Narrative-DAG.md) | ~~Narrative as DAG~~ (superseded by ADR-016) |
+| [ADR-016](grimoire-domain/docs/adr/ADR-016_Narrative-Aggregate-Architecture.md) | Narrative Aggregate Architecture — Authoritative Record |
