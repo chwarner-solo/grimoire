@@ -1,45 +1,74 @@
 package entity
 
-import "github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
+import (
+	"time"
+
+	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/event"
+	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
+)
 
 // --- NewCampaign transitions ---
 
-func (c *newCampaign) AddCharacter(id identity.CharacterID) (NewCampaign, error) {
+func (c *newCampaign) AddCharacter(id identity.CharacterID, source event.Source) (NewCampaign, []event.Event, error) {
 	if err := validateCharacterID(id); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if c.hasCharacter(id) {
-		return nil, ErrCharacterAlreadyAdded
+		return nil, nil, ErrCharacterAlreadyAdded
 	}
 	c.characterIDs = append(c.characterIDs, id)
-	return c, nil
+	evt := event.EntityLinked{
+		EntityAID:    c.id.String(),
+		EntityBID:    id.String(),
+		Relationship: "character",
+		Source:       source,
+	}
+	return c, []event.Event{evt}, nil
 }
 
-func (c *newCampaign) BeginFormation() (FormingCampaign, error) {
-	return &formingCampaign{campaignCore: c.campaignCore}, nil
+func (c *newCampaign) BeginFormation(source event.Source) (FormingCampaign, []event.Event, error) {
+	evt := event.EntityUpdated{
+		EntityID: c.id.String(),
+		Field:    "status",
+		OldValue: "new",
+		NewValue: "forming",
+		Source:   source,
+	}
+	return &formingCampaign{campaignCore: c.campaignCore}, []event.Event{evt}, nil
 }
 
 // --- FormingCampaign transitions ---
 
-func (c *formingCampaign) AddCharacter(id identity.CharacterID) (FormingCampaign, error) {
+func (c *formingCampaign) AddCharacter(id identity.CharacterID, source event.Source) (FormingCampaign, []event.Event, error) {
 	if err := validateCharacterID(id); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if c.hasCharacter(id) {
-		return nil, ErrCharacterAlreadyAdded
+		return nil, nil, ErrCharacterAlreadyAdded
 	}
 	c.characterIDs = append(c.characterIDs, id)
-	return c, nil
+	evt := event.EntityLinked{
+		EntityAID:    c.id.String(),
+		EntityBID:    id.String(),
+		Relationship: "character",
+		Source:       source,
+	}
+	return c, []event.Event{evt}, nil
 }
 
-func (c *formingCampaign) StartFirstSession(id identity.SessionID) (ActiveCampaign, error) {
+func (c *formingCampaign) StartFirstSession(id identity.SessionID, date time.Time) (ActiveCampaign, []event.Event, error) {
 	if err := validateSessionID(id); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if len(c.characterIDs) == 0 {
-		return nil, ErrNoCharacters
+		return nil, nil, ErrNoCharacters
 	}
-	return &activeCampaign{campaignCore: c.campaignCore}, nil
+	evt := event.SessionStarted{
+		SessionID:  id.String(),
+		CampaignID: c.id.String(),
+		Date:       date,
+	}
+	return &activeCampaign{campaignCore: c.campaignCore}, []event.Event{evt}, nil
 }
 
 // --- ActiveCampaign transitions ---
@@ -50,15 +79,27 @@ func (c *activeCampaign) NotifySessionSummarized() (IdleCampaign, error) {
 
 // --- IdleCampaign transitions ---
 
-func (c *idleCampaign) StartNewSession(id identity.SessionID) (ActiveCampaign, error) {
+func (c *idleCampaign) StartNewSession(id identity.SessionID, date time.Time) (ActiveCampaign, []event.Event, error) {
 	if err := validateSessionID(id); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return &activeCampaign{campaignCore: c.campaignCore}, nil
+	evt := event.SessionStarted{
+		SessionID:  id.String(),
+		CampaignID: c.id.String(),
+		Date:       date,
+	}
+	return &activeCampaign{campaignCore: c.campaignCore}, []event.Event{evt}, nil
 }
 
-func (c *idleCampaign) Complete() (CompleteCampaign, error) {
-	return &completeCampaign{campaignCore: c.campaignCore}, nil
+func (c *idleCampaign) Complete(source event.Source) (CompleteCampaign, []event.Event, error) {
+	evt := event.EntityUpdated{
+		EntityID: c.id.String(),
+		Field:    "status",
+		OldValue: "idle",
+		NewValue: "complete",
+		Source:   source,
+	}
+	return &completeCampaign{campaignCore: c.campaignCore}, []event.Event{evt}, nil
 }
 
 // --- Helpers ---

@@ -3,8 +3,10 @@ package entity_test
 import (
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/chwarner-solo/grimoire/grimoire-domain/roots/session/entity"
+	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/event"
 	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
 )
 
@@ -102,13 +104,13 @@ func TestReconstituteSession_UnknownState_ReturnsError(t *testing.T) {
 
 func TestReconstituteSession_RoundTrip(t *testing.T) {
 	// Create a session, transition it, snapshot, reconstitute, verify.
-	original, err := entity.CreateSession(identity.NewSessionID(), identity.NewCampaignID())
+	original, _, err := entity.CreateSession(identity.NewSessionID(), identity.NewCampaignID())
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	ip, _ := original.Start()
-	c, _ := ip.End()
-	s, _ := c.Summarize("Round-trip notes.")
+	ip, _, _ := original.Start(time.Now())
+	c, _, _ := ip.End()
+	s, _, _ := c.Summarize("Round-trip notes.", event.SourceGrimoire)
 
 	snap := s.Snapshot()
 	reconstituted, err := entity.ReconstituteSession(snap)
@@ -147,7 +149,7 @@ func TestReconstituteSession_CanTransitionAfterReconstitution(t *testing.T) {
 		t.Fatal("expected CompletedSession interface")
 	}
 
-	summarized, err := completed.Summarize("Post-reconstitution notes.")
+	summarized, _, err := completed.Summarize("Post-reconstitution notes.", event.SourceGrimoire)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

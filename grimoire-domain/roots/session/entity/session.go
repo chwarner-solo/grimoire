@@ -1,6 +1,9 @@
 package entity
 
-import "github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
+import (
+	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/event"
+	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
+)
 
 // sessionCore holds the minimum data needed to enforce session invariants.
 type sessionCore struct {
@@ -49,12 +52,18 @@ func (s *idleSession) Snapshot() SessionSnapshot {
 }
 
 // CreateSession constructs a new session in the New state.
-func CreateSession(id identity.SessionID, campaignID identity.CampaignID) (NewSession, error) {
+func CreateSession(id identity.SessionID, campaignID identity.CampaignID) (NewSession, []event.Event, error) {
 	if id.IsZero() {
-		return nil, ErrSessionIDRequired
+		return nil, nil, ErrSessionIDRequired
 	}
 	if campaignID.IsZero() {
-		return nil, ErrCampaignIDRequired
+		return nil, nil, ErrCampaignIDRequired
 	}
-	return &newSession{sessionCore{id: id, campaignID: campaignID}}, nil
+	evt := event.EntityCreated{
+		EntityID:   id.String(),
+		EntityType: "session",
+		Name:       "",
+		Source:     event.SourceGrimoire,
+	}
+	return &newSession{sessionCore{id: id, campaignID: campaignID}}, []event.Event{evt}, nil
 }

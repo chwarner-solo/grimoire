@@ -19,21 +19,21 @@ type Game interface {
 // The only valid transition is adding a narrative element, which moves to Draft.
 type NewGame interface {
 	Game
-	AddNarrativeElement(id identity.NarrativeID, name string) (DraftGame, error)
+	AddNarrativeElement(id identity.NarrativeID, name string, source event.Source) (DraftGame, []event.Event, error)
 }
 
 // DraftGame represents a game that has narrative content but no active campaigns.
 type DraftGame interface {
 	Game
-	AddNarrativeElement(id identity.NarrativeID, name string) (DraftGame, error)
-	LinkCampaign(id identity.CampaignID) (DraftGame, error)
+	AddNarrativeElement(id identity.NarrativeID, name string, source event.Source) (DraftGame, []event.Event, error)
+	LinkCampaign(id identity.CampaignID, source event.Source) (DraftGame, []event.Event, error)
 	ActivateFromCampaign(id identity.CampaignID) (ActiveGame, error)
 }
 
 // ActiveGame represents a game with at least one active campaign.
 type ActiveGame interface {
 	Game
-	LinkCampaign(id identity.CampaignID) (ActiveGame, error)
+	LinkCampaign(id identity.CampaignID, source event.Source) (ActiveGame, []event.Event, error)
 	NotifyCampaignIdle(id identity.CampaignID) (Game, error)
 }
 
@@ -41,7 +41,7 @@ type ActiveGame interface {
 type IdleGame interface {
 	Game
 	ActivateFromCampaign(id identity.CampaignID) (ActiveGame, error)
-	Archive() (ArchivedGame, error)
+	Archive(source event.Source) (ArchivedGame, []event.Event, error)
 }
 
 // ArchivedGame is the terminal state. No transitions are possible.

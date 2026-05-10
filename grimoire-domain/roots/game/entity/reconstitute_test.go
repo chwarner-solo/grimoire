@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/event"
 	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
 )
 
@@ -100,10 +101,10 @@ func TestReconstituteGame_UnknownState_ReturnsError(t *testing.T) {
 
 func TestReconstituteGame_RoundTrip(t *testing.T) {
 	// Create → Draft → snapshot → reconstitute → snapshot → compare
-	ng, _ := CreateGame(identity.NewGameID(), "Round Trip Game")
-	dg, _ := ng.AddNarrativeElement(identity.NewNarrativeID(), "Chapter 1")
+	ng, _, _ := CreateGame(identity.NewGameID(), "Round Trip Game", event.SourceGrimoire)
+	dg, _, _ := ng.AddNarrativeElement(identity.NewNarrativeID(), "Chapter 1", event.SourceGrimoire)
 	cid := identity.NewCampaignID()
-	dg, _ = dg.LinkCampaign(cid)
+	dg, _, _ = dg.LinkCampaign(cid, event.SourceGrimoire)
 
 	snap1 := dg.Snapshot()
 

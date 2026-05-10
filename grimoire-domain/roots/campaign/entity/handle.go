@@ -126,7 +126,7 @@ func ReplayCampaign(gameID identity.GameID, events []event.Event) (Campaign, err
 		return nil, fmt.Errorf("campaign replay: %w", err)
 	}
 
-	c, err := CreateCampaign(campID, first.Name, gameID)
+	c, _, err := CreateCampaign(campID, first.Name, gameID, event.SourceGrimoire)
 	if err != nil {
 		return nil, fmt.Errorf("campaign replay: %w", err)
 	}

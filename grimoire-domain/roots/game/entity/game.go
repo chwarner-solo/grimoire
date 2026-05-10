@@ -3,6 +3,7 @@ package entity
 import (
 	"strings"
 
+	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/event"
 	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
 )
 
@@ -40,17 +41,23 @@ func (c *gameCore) snapshot(state string) GameSnapshot {
 }
 
 // CreateGame constructs a new Game aggregate in the New state.
-func CreateGame(id identity.GameID, name string) (NewGame, error) {
+func CreateGame(id identity.GameID, name string, source event.Source) (NewGame, []event.Event, error) {
 	if id.IsZero() {
-		return nil, ErrGameIDRequired
+		return nil, nil, ErrGameIDRequired
 	}
 	if strings.TrimSpace(name) == "" {
-		return nil, ErrGameNameRequired
+		return nil, nil, ErrGameNameRequired
+	}
+	evt := event.EntityCreated{
+		EntityID:   id.String(),
+		EntityType: "game",
+		Name:       name,
+		Source:     source,
 	}
 	return &newGame{gameCore: gameCore{
 		id:   id,
 		name: name,
-	}}, nil
+	}}, []event.Event{evt}, nil
 }
 
 // --- State structs ---

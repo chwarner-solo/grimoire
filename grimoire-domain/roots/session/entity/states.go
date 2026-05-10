@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"time"
+
 	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/event"
 	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
 )
@@ -17,25 +19,25 @@ type Session interface {
 // NewSession represents a session that has been created but not yet started.
 type NewSession interface {
 	Session
-	Start() (InProgressSession, error)
+	Start(date time.Time) (InProgressSession, []event.Event, error)
 }
 
 // InProgressSession represents a session currently being played.
 type InProgressSession interface {
 	Session
-	End() (CompletedSession, error)
+	End() (CompletedSession, []event.Event, error)
 }
 
 // CompletedSession represents a session that has ended but not yet summarized.
 type CompletedSession interface {
 	Session
-	Summarize(notes string) (SummarizedSession, error)
+	Summarize(notes string, source event.Source) (SummarizedSession, []event.Event, error)
 }
 
 // SummarizedSession represents a session whose recap has been written.
 type SummarizedSession interface {
 	Session
-	Close() (IdleSession, error)
+	Close(source event.Source) (IdleSession, []event.Event, error)
 }
 
 // IdleSession is the terminal state for a session.

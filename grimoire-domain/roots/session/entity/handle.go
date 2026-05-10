@@ -89,7 +89,7 @@ func ReplaySession(campaignID identity.CampaignID, events []event.Event) (Sessio
 		return nil, fmt.Errorf("session replay: %w", err)
 	}
 
-	s, err := CreateSession(sessID, campaignID)
+	s, _, err := CreateSession(sessID, campaignID)
 	if err != nil {
 		return nil, fmt.Errorf("session replay: %w", err)
 	}

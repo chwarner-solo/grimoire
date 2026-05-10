@@ -3,6 +3,7 @@ package entity
 import (
 	"strings"
 
+	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/event"
 	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
 )
 
@@ -40,21 +41,27 @@ func (c *campaignCore) snapshot(state string) CampaignSnapshot {
 }
 
 // CreateCampaign constructs a new Campaign aggregate in the New state.
-func CreateCampaign(id identity.CampaignID, name string, gameID identity.GameID) (NewCampaign, error) {
+func CreateCampaign(id identity.CampaignID, name string, gameID identity.GameID, source event.Source) (NewCampaign, []event.Event, error) {
 	if id.IsZero() {
-		return nil, ErrCampaignIDRequired
+		return nil, nil, ErrCampaignIDRequired
 	}
 	if strings.TrimSpace(name) == "" {
-		return nil, ErrCampaignNameRequired
+		return nil, nil, ErrCampaignNameRequired
 	}
 	if gameID.IsZero() {
-		return nil, ErrGameIDRequired
+		return nil, nil, ErrGameIDRequired
+	}
+	evt := event.EntityCreated{
+		EntityID:   id.String(),
+		EntityType: "campaign",
+		Name:       name,
+		Source:     source,
 	}
 	return &newCampaign{campaignCore: campaignCore{
 		id:     id,
 		name:   name,
 		gameID: gameID,
-	}}, nil
+	}}, []event.Event{evt}, nil
 }
 
 // --- State structs ---

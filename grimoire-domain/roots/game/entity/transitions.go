@@ -1,34 +1,55 @@
 package entity
 
-import "github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
+import (
+	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/event"
+	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
+)
 
 // --- NewGame transitions ---
 
-func (g *newGame) AddNarrativeElement(id identity.NarrativeID, name string) (DraftGame, error) {
+func (g *newGame) AddNarrativeElement(id identity.NarrativeID, name string, source event.Source) (DraftGame, []event.Event, error) {
 	if err := validateNarrative(id, name); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return &draftGame{gameCore: g.gameCore}, nil
+	evt := event.EntityCreated{
+		EntityID:   id.String(),
+		EntityType: "narrative",
+		Name:       name,
+		Source:     source,
+	}
+	return &draftGame{gameCore: g.gameCore}, []event.Event{evt}, nil
 }
 
 // --- DraftGame transitions ---
 
-func (g *draftGame) AddNarrativeElement(id identity.NarrativeID, name string) (DraftGame, error) {
+func (g *draftGame) AddNarrativeElement(id identity.NarrativeID, name string, source event.Source) (DraftGame, []event.Event, error) {
 	if err := validateNarrative(id, name); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return g, nil
+	evt := event.EntityCreated{
+		EntityID:   id.String(),
+		EntityType: "narrative",
+		Name:       name,
+		Source:     source,
+	}
+	return g, []event.Event{evt}, nil
 }
 
-func (g *draftGame) LinkCampaign(id identity.CampaignID) (DraftGame, error) {
+func (g *draftGame) LinkCampaign(id identity.CampaignID, source event.Source) (DraftGame, []event.Event, error) {
 	if err := validateCampaignID(id); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if g.hasCampaign(id) {
-		return nil, ErrCampaignAlreadyLinked
+		return nil, nil, ErrCampaignAlreadyLinked
 	}
 	g.campaignIDs = append(g.campaignIDs, id)
-	return g, nil
+	evt := event.EntityLinked{
+		EntityAID:    g.id.String(),
+		EntityBID:    id.String(),
+		Relationship: "campaign",
+		Source:       source,
+	}
+	return g, []event.Event{evt}, nil
 }
 
 func (g *draftGame) ActivateFromCampaign(id identity.CampaignID) (ActiveGame, error) {
@@ -44,15 +65,21 @@ func (g *draftGame) ActivateFromCampaign(id identity.CampaignID) (ActiveGame, er
 
 // --- ActiveGame transitions ---
 
-func (g *activeGame) LinkCampaign(id identity.CampaignID) (ActiveGame, error) {
+func (g *activeGame) LinkCampaign(id identity.CampaignID, source event.Source) (ActiveGame, []event.Event, error) {
 	if err := validateCampaignID(id); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if g.hasCampaign(id) {
-		return nil, ErrCampaignAlreadyLinked
+		return nil, nil, ErrCampaignAlreadyLinked
 	}
 	g.campaignIDs = append(g.campaignIDs, id)
-	return g, nil
+	evt := event.EntityLinked{
+		EntityAID:    g.id.String(),
+		EntityBID:    id.String(),
+		Relationship: "campaign",
+		Source:       source,
+	}
+	return g, []event.Event{evt}, nil
 }
 
 func (g *activeGame) NotifyCampaignIdle(id identity.CampaignID) (Game, error) {
@@ -83,8 +110,15 @@ func (g *idleGame) ActivateFromCampaign(id identity.CampaignID) (ActiveGame, err
 	return &activeGame{gameCore: g.gameCore}, nil
 }
 
-func (g *idleGame) Archive() (ArchivedGame, error) {
-	return &archivedGame{gameCore: g.gameCore}, nil
+func (g *idleGame) Archive(source event.Source) (ArchivedGame, []event.Event, error) {
+	evt := event.EntityUpdated{
+		EntityID: g.id.String(),
+		Field:    "status",
+		OldValue: "idle",
+		NewValue: "archived",
+		Source:   source,
+	}
+	return &archivedGame{gameCore: g.gameCore}, []event.Event{evt}, nil
 }
 
 // --- Helpers ---

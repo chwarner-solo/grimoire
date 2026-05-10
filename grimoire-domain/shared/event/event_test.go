@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/event"
+	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
 )
 
 func TestEntityCreated_ImplementsEvent(t *testing.T) {
@@ -74,5 +75,62 @@ func TestSessionEnded_ImplementsEvent(t *testing.T) {
 	}
 	if e.EventType() != event.TypeSessionEnded {
 		t.Errorf("expected %s, got %s", event.TypeSessionEnded, e.EventType())
+	}
+}
+
+func TestEventEnvelope_CarriesTypedPayload(t *testing.T) {
+	eventID, _ := identity.ParseEventID("01ARZ3NDEKTSV4RRFFQ69G5FAV")
+	gameID := identity.NewGameID()
+	campID := identity.NewCampaignID()
+
+	env := event.EventEnvelope{
+		ID:             eventID,
+		Type:           event.TypeEntityCreated,
+		AggregateID:    gameID.GrimoireID,
+		AggregateType:  event.AggregateGame,
+		SequenceNumber: 1,
+		CampaignID:     campID,
+		Source:         event.SourceGrimoire,
+		ActorID:        "gm-1",
+		OccurredAt:     time.Now(),
+		Payload: event.EntityCreated{
+			EntityID:   gameID.String(),
+			EntityType: "game",
+			Name:       "My Game",
+			Source:     event.SourceGrimoire,
+		},
+	}
+
+	if env.Payload.EventType() != event.TypeEntityCreated {
+		t.Errorf("expected payload type %s, got %s", event.TypeEntityCreated, env.Payload.EventType())
+	}
+	if env.AggregateType != event.AggregateGame {
+		t.Errorf("expected aggregate type 'game', got %q", env.AggregateType)
+	}
+	if env.SequenceNumber != 1 {
+		t.Errorf("expected sequence number 1, got %d", env.SequenceNumber)
+	}
+	if env.ID.String() != "01ARZ3NDEKTSV4RRFFQ69G5FAV" {
+		t.Errorf("expected event ID '01ARZ3NDEKTSV4RRFFQ69G5FAV', got %q", env.ID.String())
+	}
+}
+
+func TestEventEnvelope_ZeroSessionID_WhenNotApplicable(t *testing.T) {
+	env := event.EventEnvelope{
+		Type:          event.TypeEntityCreated,
+		AggregateType: event.AggregateGame,
+		Payload: event.EntityCreated{
+			EntityID:   "id-1",
+			EntityType: "game",
+			Name:       "My Game",
+			Source:     event.SourceGrimoire,
+		},
+	}
+
+	if !env.SessionID.IsZero() {
+		t.Error("expected zero SessionID when not applicable")
+	}
+	if !env.CampaignID.IsZero() {
+		t.Error("expected zero CampaignID when not applicable")
 	}
 }

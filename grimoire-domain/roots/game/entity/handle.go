@@ -136,7 +136,7 @@ func ReplayGame(events []event.Event) (Game, error) {
 		return nil, fmt.Errorf("game replay: %w", err)
 	}
 
-	g, err := CreateGame(gameID, first.Name)
+	g, _, err := CreateGame(gameID, first.Name, event.SourceGrimoire)
 	if err != nil {
 		return nil, fmt.Errorf("game replay: %w", err)
 	}

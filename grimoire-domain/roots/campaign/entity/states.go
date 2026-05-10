@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"time"
+
 	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/event"
 	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
 )
@@ -19,16 +21,16 @@ type Campaign interface {
 // Characters can be added and the GM can begin formation.
 type NewCampaign interface {
 	Campaign
-	AddCharacter(id identity.CharacterID) (NewCampaign, error)
-	BeginFormation() (FormingCampaign, error)
+	AddCharacter(id identity.CharacterID, source event.Source) (NewCampaign, []event.Event, error)
+	BeginFormation(source event.Source) (FormingCampaign, []event.Event, error)
 }
 
 // FormingCampaign represents a campaign where the GM is assembling the party.
 // Characters can still be added, and the first session can start if at least one character exists.
 type FormingCampaign interface {
 	Campaign
-	AddCharacter(id identity.CharacterID) (FormingCampaign, error)
-	StartFirstSession(id identity.SessionID) (ActiveCampaign, error)
+	AddCharacter(id identity.CharacterID, source event.Source) (FormingCampaign, []event.Event, error)
+	StartFirstSession(id identity.SessionID, date time.Time) (ActiveCampaign, []event.Event, error)
 }
 
 // ActiveCampaign represents a campaign with an in-progress session.
@@ -40,8 +42,8 @@ type ActiveCampaign interface {
 // IdleCampaign represents a campaign between sessions.
 type IdleCampaign interface {
 	Campaign
-	StartNewSession(id identity.SessionID) (ActiveCampaign, error)
-	Complete() (CompleteCampaign, error)
+	StartNewSession(id identity.SessionID, date time.Time) (ActiveCampaign, []event.Event, error)
+	Complete(source event.Source) (CompleteCampaign, []event.Event, error)
 }
 
 // CompleteCampaign is the terminal state. No transitions are possible.

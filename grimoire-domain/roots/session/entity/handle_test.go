@@ -14,7 +14,7 @@ import (
 
 func newSessionForHandle(t *testing.T) entity.Session {
 	t.Helper()
-	s, err := entity.CreateSession(identity.NewSessionID(), identity.NewCampaignID())
+	s, _, err := entity.CreateSession(identity.NewSessionID(), identity.NewCampaignID())
 	if err != nil {
 		t.Fatalf("failed to create session: %v", err)
 	}

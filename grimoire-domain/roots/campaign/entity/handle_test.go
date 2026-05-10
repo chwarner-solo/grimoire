@@ -14,7 +14,7 @@ import (
 
 func newCampaignForHandle(t *testing.T) entity.Campaign {
 	t.Helper()
-	c, err := entity.CreateCampaign(identity.NewCampaignID(), "Test Campaign", identity.NewGameID())
+	c, _, err := entity.CreateCampaign(identity.NewCampaignID(), "Test Campaign", identity.NewGameID(), event.SourceGrimoire)
 	if err != nil {
 		t.Fatalf("failed to create campaign: %v", err)
 	}

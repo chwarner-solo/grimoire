@@ -3,7 +3,9 @@ package entity
 import (
 	"errors"
 	"testing"
+	"time"
 
+	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/event"
 	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
 )
 
@@ -105,10 +107,10 @@ func TestReconstituteCampaign_UnknownState_ReturnsError(t *testing.T) {
 
 func TestReconstituteCampaign_RoundTrip(t *testing.T) {
 	// Create → AddCharacter → BeginFormation → snapshot → reconstitute → snapshot → compare
-	nc, _ := CreateCampaign(identity.NewCampaignID(), "Round Trip Campaign", identity.NewGameID())
+	nc, _, _ := CreateCampaign(identity.NewCampaignID(), "Round Trip Campaign", identity.NewGameID(), event.SourceGrimoire)
 	charID := identity.NewCharacterID()
-	nc, _ = nc.AddCharacter(charID)
-	fc, _ := nc.BeginFormation()
+	nc, _, _ = nc.AddCharacter(charID, event.SourceGrimoire)
+	fc, _, _ := nc.BeginFormation(event.SourceGrimoire)
 
 	snap1 := fc.Snapshot()
 
@@ -153,7 +155,7 @@ func TestReconstituteCampaign_ReconstitutedForming_CanTransition(t *testing.T) {
 	c, _ := ReconstituteCampaign(snap)
 	fc := c.(FormingCampaign)
 
-	ac, err := fc.StartFirstSession(identity.NewSessionID())
+	ac, _, err := fc.StartFirstSession(identity.NewSessionID(), time.Now())
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

@@ -1,5 +1,40 @@
 package identity
 
+import (
+	"encoding/json"
+	"fmt"
+)
+
+// EventID identifies an event using a ULID string.
+// Unlike aggregate IDs (UUID-based), EventIDs use ULID for global sortability.
+// The domain defines the type; infrastructure generates ULID values.
+type EventID struct {
+	value string
+}
+
+func ParseEventID(s string) (EventID, error) {
+	if s == "" {
+		return EventID{}, fmt.Errorf("%w: empty event id", ErrInvalidID)
+	}
+	return EventID{value: s}, nil
+}
+
+func (id EventID) String() string { return id.value }
+func (id EventID) IsZero() bool   { return id.value == "" }
+
+func (id EventID) MarshalJSON() ([]byte, error) {
+	return json.Marshal(id.value)
+}
+
+func (id *EventID) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	id.value = s
+	return nil
+}
+
 type GameID struct{ GrimoireID }
 type CampaignID struct{ GrimoireID }
 type SessionID struct{ GrimoireID }

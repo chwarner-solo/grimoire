@@ -15,7 +15,7 @@ import (
 func newGameForHandle(t *testing.T) entity.Game {
 	t.Helper()
 	id := identity.NewGameID()
-	g, err := entity.CreateGame(id, "Test Game")
+	g, _, err := entity.CreateGame(id, "Test Game", event.SourceGrimoire)
 	if err != nil {
 		t.Fatalf("failed to create game: %v", err)
 	}

@@ -171,3 +171,36 @@ func TestParseFactionID_InvalidInput_ReturnsError(t *testing.T) {
 		t.Fatal("expected error for invalid input")
 	}
 }
+
+// --- EventID tests ---
+
+func TestParseEventID_ValidString_Succeeds(t *testing.T) {
+	id, err := ParseEventID("01ARZ3NDEKTSV4RRFFQ69G5FAV")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if id.String() != "01ARZ3NDEKTSV4RRFFQ69G5FAV" {
+		t.Fatalf("expected '01ARZ3NDEKTSV4RRFFQ69G5FAV', got %q", id.String())
+	}
+}
+
+func TestParseEventID_EmptyString_ReturnsError(t *testing.T) {
+	_, err := ParseEventID("")
+	if err == nil {
+		t.Fatal("expected error for empty event ID")
+	}
+}
+
+func TestEventID_IsZero_WhenEmpty(t *testing.T) {
+	var id EventID
+	if !id.IsZero() {
+		t.Fatal("zero-value EventID should be zero")
+	}
+}
+
+func TestEventID_IsNotZero_WhenParsed(t *testing.T) {
+	id, _ := ParseEventID("some-ulid")
+	if id.IsZero() {
+		t.Fatal("parsed EventID should not be zero")
+	}
+}
