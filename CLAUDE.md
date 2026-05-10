@@ -283,5 +283,6 @@ type EventEnvelope struct {
 | ADR-014 | Scaling Path — Firestore to Bigtable |
 | ADR-015 | ~~Narrative as DAG~~ (superseded by ADR-016) |
 | ADR-016 | Narrative Aggregate Architecture — Authoritative Record |
+| ADR-017 | Faction Aggregate Architecture |
 
 See `docs/adr/` for full records.
