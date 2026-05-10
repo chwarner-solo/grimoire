@@ -29,6 +29,7 @@ grimoire/main/
         entity/
         value/
         port/
+        interactor/                ← use-case orchestration (Clean Architecture)
       campaign/
         entity/
         value/
@@ -109,6 +110,14 @@ grimoire-api            →  grimoire-domain + grimoire-infrastructure
   - Migration is an adapter swap in grimoire-infrastructure
 - Do not add fields to aggregates to satisfy query needs
 
+### Interactors (Clean Architecture Use Cases)
+- Interactors live in `roots/<aggregate>/interactor/`
+- They orchestrate: validate → create aggregate → save → dispatch events
+- They define local interface aliases for ports (avoids circular imports)
+- Infrastructure concerns (EventID/ULID, SequenceNumber) are set by adapters, not interactors
+- If save fails, no events are dispatched
+- If dispatch fails after save, error is returned for caller to decide retry strategy
+
 ### Event Driven (ADR-004, ADR-011, ADR-012)
 - All state changes produce events
 - Events are the source of truth
@@ -122,13 +131,23 @@ grimoire-api            →  grimoire-domain + grimoire-infrastructure
 ## Aggregate Roots
 
 ```
-Game        →  the world, canonical GM content
-Campaign    →  a table running a Game
-Character   →  PC or NPC
-Location    →  places in the world
-Narrative   →  lore, acts, revelations, secrets
-Faction     →  groups, allegiances, goals
+Game              →  the world, canonical GM content
+Campaign          →  a table running a Game
+Character         →  PC or NPC
+Location          →  places in the world
+MasterNarrative   →  canonical story DAG, beats, acts, secrets, lore (Game-owned)
+CampaignNarrative →  a Campaign's path through the story DAG (Campaign-owned)
+Faction           →  groups, allegiances, goals
 ```
+
+The Narrative subsystem is two aggregates that collaborate (ADR-015):
+- **MasterNarrative** — the GM's world truth, shared across all Campaigns
+- **CampaignNarrative** — one table's discoveries, decisions, and campaign-specific beats
+
+**Beat** is a shared entity owned by the Narrative subsystem. Content
+(name, description, playerDescription) lives in Neo4j only. Command side
+(Firestore) holds only structural fields: IDs, type, scope, prerequisite sets.
+Events carry all fields; GCS preserves full content for Neo4j rebuilds.
 
 Each root owns its lifecycle. No root reaches into another root.
 Cross-root references use typed IDs only — never navigation.
@@ -262,5 +281,6 @@ type EventEnvelope struct {
 | ADR-012 | Event Sequencing |
 | ADR-013 | Four Module Workspace |
 | ADR-014 | Scaling Path — Firestore to Bigtable |
+| ADR-015 | Narrative as DAG — MasterNarrative + CampaignNarrative |
 
 See `docs/adr/` for full records.
