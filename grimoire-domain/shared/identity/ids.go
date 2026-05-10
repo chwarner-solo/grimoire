@@ -41,6 +41,7 @@ type SessionID struct{ GrimoireID }
 type CharacterID struct{ GrimoireID }
 type LocationID struct{ GrimoireID }
 type FactionID struct{ GrimoireID }
+type FactionMembershipID struct{ GrimoireID }
 type MasterNarrativeID struct{ GrimoireID }
 type CampaignNarrativeID struct{ GrimoireID }
 type BeatID struct{ GrimoireID }
@@ -120,6 +121,18 @@ func ParseFactionID(s string) (FactionID, error) {
 		return FactionID{}, err
 	}
 	return FactionID{base}, nil
+}
+
+func NewFactionMembershipID() FactionMembershipID {
+	return FactionMembershipID{NewGrimoireID()}
+}
+
+func ParseFactionMembershipID(s string) (FactionMembershipID, error) {
+	base, err := ParseGrimoireID(s)
+	if err != nil {
+		return FactionMembershipID{}, err
+	}
+	return FactionMembershipID{base}, nil
 }
 
 func NewMasterNarrativeID() MasterNarrativeID {

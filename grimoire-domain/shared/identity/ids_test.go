@@ -335,8 +335,39 @@ func TestParseLocationID_InvalidInput_ReturnsError(t *testing.T) {
 	}
 }
 
+func TestFactionMembershipID_NewAndParse_Roundtrip(t *testing.T) {
+	id := NewFactionMembershipID()
+	parsed, err := ParseFactionMembershipID(id.String())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if parsed.String() != id.String() {
+		t.Fatalf("expected %s, got %s", id, parsed)
+	}
+}
+
+func TestFactionMembershipID_NewIsNotZero(t *testing.T) {
+	if NewFactionMembershipID().IsZero() {
+		t.Fatal("new FactionMembershipID should not be zero")
+	}
+}
+
+func TestFactionMembershipID_ZeroValue_IsZero(t *testing.T) {
+	var id FactionMembershipID
+	if !id.IsZero() {
+		t.Fatal("zero-value FactionMembershipID should be zero")
+	}
+}
+
 func TestParseFactionID_InvalidInput_ReturnsError(t *testing.T) {
 	_, err := ParseFactionID("not-valid")
+	if err == nil {
+		t.Fatal("expected error for invalid input")
+	}
+}
+
+func TestParseFactionMembershipID_InvalidInput_ReturnsError(t *testing.T) {
+	_, err := ParseFactionMembershipID("not-valid")
 	if err == nil {
 		t.Fatal("expected error for invalid input")
 	}
