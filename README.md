@@ -70,3 +70,4 @@ Design decisions are documented as ADRs in [`grimoire-domain/docs/adr/`](grimoir
 | [ADR-015](grimoire-domain/docs/adr/ADR-015_Narrative-DAG.md) | ~~Narrative as DAG~~ (superseded by ADR-016) |
 | [ADR-016](grimoire-domain/docs/adr/ADR-016_Narrative-Aggregate-Architecture.md) | Narrative Aggregate Architecture — Authoritative Record |
 | [ADR-017](grimoire-domain/docs/adr/ADR-017_Faction-Aggregate.md) | Faction Aggregate Architecture |
+| [ADR-018](grimoire-domain/docs/adr/ADR-018_Location-Aggregate.md) | Location Aggregate Architecture |
