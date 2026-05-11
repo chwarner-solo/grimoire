@@ -8,21 +8,23 @@ import (
 
 // CampaignSnapshot is the DTO used for persistence and reconstitution.
 type CampaignSnapshot struct {
-	ID           identity.CampaignID
-	Name         string
-	GameID       identity.GameID
-	State        string
-	CharacterIDs []identity.CharacterID
+	ID                identity.CampaignID
+	Name              string
+	GameID            identity.GameID
+	State             string
+	CharacterIDs      []identity.CharacterID
+	CurrentLocationID identity.LocationID
 }
 
 // ReconstituteCampaign rebuilds a Campaign aggregate from a persisted snapshot.
 // It trusts persisted data and bypasses constructor validation.
 func ReconstituteCampaign(snap CampaignSnapshot) (Campaign, error) {
 	core := campaignCore{
-		id:           snap.ID,
-		name:         snap.Name,
-		gameID:       snap.GameID,
-		characterIDs: snap.CharacterIDs,
+		id:                snap.ID,
+		name:              snap.Name,
+		gameID:            snap.GameID,
+		characterIDs:      snap.CharacterIDs,
+		currentLocationID: snap.CurrentLocationID,
 	}
 	switch snap.State {
 	case "new":

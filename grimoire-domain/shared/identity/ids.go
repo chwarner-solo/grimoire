@@ -50,6 +50,7 @@ type SecretID struct{ GrimoireID }
 type LoreID struct{ GrimoireID }
 type DecisionID struct{ GrimoireID }
 type RevelationID struct{ GrimoireID }
+type SceneID struct{ GrimoireID }
 
 func NewGameID() GameID {
 	return GameID{NewGrimoireID()}
@@ -229,4 +230,16 @@ func ParseRevelationID(s string) (RevelationID, error) {
 		return RevelationID{}, err
 	}
 	return RevelationID{base}, nil
+}
+
+func NewSceneID() SceneID {
+	return SceneID{NewGrimoireID()}
+}
+
+func ParseSceneID(s string) (SceneID, error) {
+	base, err := ParseGrimoireID(s)
+	if err != nil {
+		return SceneID{}, err
+	}
+	return SceneID{base}, nil
 }

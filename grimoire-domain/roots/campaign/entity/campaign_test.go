@@ -193,6 +193,53 @@ func TestIdleCampaign_Complete_TransitionsToComplete(t *testing.T) {
 	}
 }
 
+// --- ActiveCampaign MoveToLocation tests ---
+
+func TestActiveCampaign_MoveToLocation_Succeeds(t *testing.T) {
+	ac := mustReachActive(t)
+	locID := identity.NewLocationID()
+	result, events, err := ac.MoveToLocation(locID, event.SourceGrimoire)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if result.CurrentLocationID().String() != locID.String() {
+		t.Fatalf("expected currentLocationID %s, got %s", locID, result.CurrentLocationID())
+	}
+	if len(events) != 1 {
+		t.Fatalf("expected 1 event, got %d", len(events))
+	}
+	eu, ok := events[0].(event.EntityUpdated)
+	if !ok {
+		t.Fatalf("expected EntityUpdated, got %T", events[0])
+	}
+	if eu.Field != "current_location_id" {
+		t.Fatalf("expected field 'current_location_id', got %q", eu.Field)
+	}
+	if eu.NewValue != locID.String() {
+		t.Fatalf("expected new value %s, got %s", locID.String(), eu.NewValue)
+	}
+}
+
+func TestActiveCampaign_MoveToLocation_RequiresLocationID(t *testing.T) {
+	ac := mustReachActive(t)
+	_, _, err := ac.MoveToLocation(identity.LocationID{}, event.SourceGrimoire)
+	if !errors.Is(err, ErrLocationIDRequired) {
+		t.Fatalf("expected ErrLocationIDRequired, got %v", err)
+	}
+}
+
+func TestActiveCampaign_MoveToLocation_OldValueTracked(t *testing.T) {
+	ac := mustReachActive(t)
+	firstLoc := identity.NewLocationID()
+	ac, _, _ = ac.MoveToLocation(firstLoc, event.SourceGrimoire)
+	secondLoc := identity.NewLocationID()
+	_, events, _ := ac.MoveToLocation(secondLoc, event.SourceGrimoire)
+	eu := events[0].(event.EntityUpdated)
+	if eu.OldValue != firstLoc.String() {
+		t.Fatalf("expected old value %s, got %s", firstLoc.String(), eu.OldValue)
+	}
+}
+
 // --- CompleteCampaign state tests ---
 
 func TestCompleteCampaign_PreservesIdentity(t *testing.T) {

@@ -13,6 +13,7 @@ type Campaign interface {
 	isCampaign()
 	CampaignID() identity.CampaignID
 	CampaignName() string
+	CurrentLocationID() identity.LocationID
 	Snapshot() CampaignSnapshot
 	Handle(evt event.Event) (Campaign, error)
 }
@@ -37,6 +38,7 @@ type FormingCampaign interface {
 type ActiveCampaign interface {
 	Campaign
 	NotifySessionSummarized() (IdleCampaign, error)
+	MoveToLocation(locationID identity.LocationID, source event.Source) (ActiveCampaign, []event.Event, error)
 }
 
 // IdleCampaign represents a campaign between sessions.

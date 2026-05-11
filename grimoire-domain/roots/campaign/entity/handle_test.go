@@ -154,6 +154,24 @@ func TestHandle_ActiveCampaign_SessionEnded_TransitionsToIdle(t *testing.T) {
 	}
 }
 
+func TestHandle_ActiveCampaign_MoveToLocation(t *testing.T) {
+	c := activeCampaignForHandle(t)
+	locID := identity.NewLocationID()
+	result, err := c.Handle(event.EntityUpdated{
+		EntityID: c.CampaignID().String(), Field: "current_location_id",
+		OldValue: "", NewValue: locID.String(), Source: event.SourceGrimoire,
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if _, ok := result.(entity.ActiveCampaign); !ok {
+		t.Fatalf("expected ActiveCampaign, got %T", result)
+	}
+	if result.CurrentLocationID().String() != locID.String() {
+		t.Fatalf("expected currentLocationID %s, got %s", locID, result.CurrentLocationID())
+	}
+}
+
 func TestHandle_ActiveCampaign_UnexpectedEvent_ReturnsError(t *testing.T) {
 	c := activeCampaignForHandle(t)
 	_, err := c.Handle(event.EntityCreated{
@@ -236,12 +254,14 @@ func TestReplayCampaign_FullLifecycle(t *testing.T) {
 	gameID := identity.NewGameID()
 	charID := identity.NewCharacterID()
 	sessID := identity.NewSessionID()
+	locID := identity.NewLocationID()
 
 	events := []event.Event{
 		event.EntityCreated{EntityID: campID.String(), EntityType: "campaign", Name: "Heroes of Light", Source: event.SourceGrimoire},
 		event.EntityLinked{EntityAID: campID.String(), EntityBID: charID.String(), Relationship: "character", Source: event.SourceGrimoire},
 		event.EntityUpdated{EntityID: campID.String(), Field: "status", OldValue: "new", NewValue: "forming", Source: event.SourceGrimoire},
 		event.SessionStarted{SessionID: sessID.String(), CampaignID: campID.String(), Date: time.Now()},
+		event.EntityUpdated{EntityID: campID.String(), Field: "current_location_id", OldValue: "", NewValue: locID.String(), Source: event.SourceGrimoire},
 		event.SessionEnded{SessionID: sessID.String()},
 		event.EntityUpdated{EntityID: campID.String(), Field: "status", OldValue: "idle", NewValue: "complete", Source: event.SourceGrimoire},
 	}
@@ -255,6 +275,9 @@ func TestReplayCampaign_FullLifecycle(t *testing.T) {
 	}
 	if result.CampaignName() != "Heroes of Light" {
 		t.Fatalf("expected name 'Heroes of Light', got '%s'", result.CampaignName())
+	}
+	if result.CurrentLocationID().String() != locID.String() {
+		t.Fatalf("expected currentLocationID %s, got %s", locID, result.CurrentLocationID())
 	}
 }
 

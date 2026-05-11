@@ -429,6 +429,39 @@ func TestParseRevelationID_InvalidInput_ReturnsError(t *testing.T) {
 	}
 }
 
+// --- SceneID tests ---
+
+func TestSceneID_NewAndParse_Roundtrip(t *testing.T) {
+	id := NewSceneID()
+	parsed, err := ParseSceneID(id.String())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if parsed.String() != id.String() {
+		t.Fatalf("expected %s, got %s", id, parsed)
+	}
+}
+
+func TestSceneID_NewIsNotZero(t *testing.T) {
+	if NewSceneID().IsZero() {
+		t.Fatal("new SceneID should not be zero")
+	}
+}
+
+func TestSceneID_ZeroValue_IsZero(t *testing.T) {
+	var id SceneID
+	if !id.IsZero() {
+		t.Fatal("zero-value SceneID should be zero")
+	}
+}
+
+func TestParseSceneID_InvalidInput_ReturnsError(t *testing.T) {
+	_, err := ParseSceneID("not-valid")
+	if err == nil {
+		t.Fatal("expected error for invalid input")
+	}
+}
+
 // --- EventID tests ---
 
 func TestParseEventID_ValidString_Succeeds(t *testing.T) {

@@ -9,15 +9,17 @@ import (
 
 // campaignCore holds the shared state for all Campaign states.
 type campaignCore struct {
-	id           identity.CampaignID
-	name         string
-	gameID       identity.GameID
-	characterIDs []identity.CharacterID
+	id                identity.CampaignID
+	name              string
+	gameID            identity.GameID
+	characterIDs      []identity.CharacterID
+	currentLocationID identity.LocationID
 }
 
-func (c *campaignCore) CampaignID() identity.CampaignID { return c.id }
-func (c *campaignCore) CampaignName() string            { return c.name }
-func (c *campaignCore) isCampaign()                     {}
+func (c *campaignCore) CampaignID() identity.CampaignID         { return c.id }
+func (c *campaignCore) CampaignName() string                    { return c.name }
+func (c *campaignCore) CurrentLocationID() identity.LocationID  { return c.currentLocationID }
+func (c *campaignCore) isCampaign()                             {}
 
 func (c *campaignCore) hasCharacter(id identity.CharacterID) bool {
 	for _, cid := range c.characterIDs {
@@ -32,11 +34,12 @@ func (c *campaignCore) snapshot(state string) CampaignSnapshot {
 	ids := make([]identity.CharacterID, len(c.characterIDs))
 	copy(ids, c.characterIDs)
 	return CampaignSnapshot{
-		ID:           c.id,
-		Name:         c.name,
-		GameID:       c.gameID,
-		State:        state,
-		CharacterIDs: ids,
+		ID:                c.id,
+		Name:              c.name,
+		GameID:            c.gameID,
+		State:             state,
+		CharacterIDs:      ids,
+		CurrentLocationID: c.currentLocationID,
 	}
 }
 

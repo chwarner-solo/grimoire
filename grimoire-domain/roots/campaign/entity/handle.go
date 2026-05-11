@@ -60,10 +60,23 @@ func (c *formingCampaign) Handle(evt event.Event) (Campaign, error) {
 // --- activeCampaign Handle ---
 
 func (c *activeCampaign) Handle(evt event.Event) (Campaign, error) {
-	switch evt.(type) {
+	switch e := evt.(type) {
 	case event.SessionEnded:
 		core := c.copyCore()
 		return &idleCampaign{campaignCore: core}, nil
+	case event.EntityUpdated:
+		if e.Field == "current_location_id" {
+			core := c.copyCore()
+			if e.NewValue != "" {
+				locID, err := identity.ParseLocationID(e.NewValue)
+				if err != nil {
+					return nil, fmt.Errorf("campaign handle: %w", err)
+				}
+				core.currentLocationID = locID
+			}
+			return &activeCampaign{campaignCore: core}, nil
+		}
+		return nil, ErrUnexpectedEvent
 	default:
 		return nil, ErrUnexpectedEvent
 	}
@@ -99,10 +112,11 @@ func (c *campaignCore) copyCore() campaignCore {
 	ids := make([]identity.CharacterID, len(c.characterIDs))
 	copy(ids, c.characterIDs)
 	return campaignCore{
-		id:           c.id,
-		name:         c.name,
-		gameID:       c.gameID,
-		characterIDs: ids,
+		id:                c.id,
+		name:              c.name,
+		gameID:            c.gameID,
+		characterIDs:      ids,
+		currentLocationID: c.currentLocationID,
 	}
 }
 

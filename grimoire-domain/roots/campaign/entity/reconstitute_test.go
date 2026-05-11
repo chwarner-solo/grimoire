@@ -141,6 +141,28 @@ func TestReconstituteCampaign_RoundTrip(t *testing.T) {
 			t.Fatalf("CharacterID[%d] mismatch after round trip", i)
 		}
 	}
+	if snap1.CurrentLocationID.String() != snap2.CurrentLocationID.String() {
+		t.Fatal("CurrentLocationID mismatch after round trip")
+	}
+}
+
+func TestReconstituteCampaign_WithCurrentLocationID(t *testing.T) {
+	locID := identity.NewLocationID()
+	snap := CampaignSnapshot{
+		ID:                identity.NewCampaignID(),
+		Name:              "Campaign",
+		GameID:            identity.NewGameID(),
+		State:             "active",
+		CharacterIDs:      []identity.CharacterID{identity.NewCharacterID()},
+		CurrentLocationID: locID,
+	}
+	c, err := ReconstituteCampaign(snap)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if c.CurrentLocationID().String() != locID.String() {
+		t.Fatalf("expected currentLocationID %s, got %s", locID, c.CurrentLocationID())
+	}
 }
 
 func TestReconstituteCampaign_ReconstitutedForming_CanTransition(t *testing.T) {

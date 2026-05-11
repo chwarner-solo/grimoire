@@ -77,6 +77,25 @@ func (c *activeCampaign) NotifySessionSummarized() (IdleCampaign, error) {
 	return &idleCampaign{campaignCore: c.campaignCore}, nil
 }
 
+func (c *activeCampaign) MoveToLocation(locationID identity.LocationID, source event.Source) (ActiveCampaign, []event.Event, error) {
+	if locationID.IsZero() {
+		return nil, nil, ErrLocationIDRequired
+	}
+	oldValue := ""
+	if !c.currentLocationID.IsZero() {
+		oldValue = c.currentLocationID.String()
+	}
+	c.currentLocationID = locationID
+	evt := event.EntityUpdated{
+		EntityID: c.id.String(),
+		Field:    "current_location_id",
+		OldValue: oldValue,
+		NewValue: locationID.String(),
+		Source:   source,
+	}
+	return c, []event.Event{evt}, nil
+}
+
 // --- IdleCampaign transitions ---
 
 func (c *idleCampaign) StartNewSession(id identity.SessionID, date time.Time) (ActiveCampaign, []event.Event, error) {

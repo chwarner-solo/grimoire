@@ -139,10 +139,117 @@ func TestCampaignNarrative_DiscoverBeat_MultiplePathsOR(t *testing.T) {
 	}
 }
 
+// --- MarkSceneExplored tests ---
+
+func TestCampaignNarrative_MarkSceneExplored(t *testing.T) {
+	cn, _, _ := CreateCampaignNarrative(identity.NewCampaignNarrativeID(), identity.NewCampaignID(), identity.NewGameID(), event.SourceGrimoire)
+	sceneID := identity.NewSceneID()
+	events, err := cn.MarkSceneExplored(sceneID)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(events) != 1 {
+		t.Fatalf("expected 1 event, got %d", len(events))
+	}
+	el, ok := events[0].(event.EntityLinked)
+	if !ok {
+		t.Fatalf("expected EntityLinked, got %T", events[0])
+	}
+	if el.Relationship != "explored" {
+		t.Fatalf("expected relationship 'explored', got %q", el.Relationship)
+	}
+	if !cn.HasExploredScene(sceneID) {
+		t.Fatal("expected scene to be marked as explored")
+	}
+}
+
+func TestCampaignNarrative_MarkSceneExplored_Idempotent(t *testing.T) {
+	cn, _, _ := CreateCampaignNarrative(identity.NewCampaignNarrativeID(), identity.NewCampaignID(), identity.NewGameID(), event.SourceGrimoire)
+	sceneID := identity.NewSceneID()
+	cn.MarkSceneExplored(sceneID)
+	events, _ := cn.MarkSceneExplored(sceneID)
+	if len(events) != 0 {
+		t.Fatalf("expected 0 events for duplicate, got %d", len(events))
+	}
+}
+
+// --- MarkLocationVisited tests ---
+
+func TestCampaignNarrative_MarkLocationVisited(t *testing.T) {
+	cn, _, _ := CreateCampaignNarrative(identity.NewCampaignNarrativeID(), identity.NewCampaignID(), identity.NewGameID(), event.SourceGrimoire)
+	locID := identity.NewLocationID()
+	events, err := cn.MarkLocationVisited(locID)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(events) != 1 {
+		t.Fatalf("expected 1 event, got %d", len(events))
+	}
+	el, ok := events[0].(event.EntityLinked)
+	if !ok {
+		t.Fatalf("expected EntityLinked, got %T", events[0])
+	}
+	if el.Relationship != "visited" {
+		t.Fatalf("expected relationship 'visited', got %q", el.Relationship)
+	}
+	if !cn.HasVisitedLocation(locID) {
+		t.Fatal("expected location to be marked as visited")
+	}
+}
+
+func TestCampaignNarrative_MarkLocationVisited_Idempotent(t *testing.T) {
+	cn, _, _ := CreateCampaignNarrative(identity.NewCampaignNarrativeID(), identity.NewCampaignID(), identity.NewGameID(), event.SourceGrimoire)
+	locID := identity.NewLocationID()
+	cn.MarkLocationVisited(locID)
+	events, _ := cn.MarkLocationVisited(locID)
+	if len(events) != 0 {
+		t.Fatalf("expected 0 events for duplicate, got %d", len(events))
+	}
+}
+
+// --- CanAccessScene tests ---
+
+func TestCampaignNarrative_CanAccessScene_NoPrerequisites(t *testing.T) {
+	cn, _, _ := CreateCampaignNarrative(identity.NewCampaignNarrativeID(), identity.NewCampaignID(), identity.NewGameID(), event.SourceGrimoire)
+	if !cn.CanAccessScene(nil) {
+		t.Fatal("expected access with no prerequisites")
+	}
+}
+
+func TestCampaignNarrative_CanAccessScene_PrerequisiteMet(t *testing.T) {
+	cn, _, _ := CreateCampaignNarrative(identity.NewCampaignNarrativeID(), identity.NewCampaignID(), identity.NewGameID(), event.SourceGrimoire)
+	prereqID := identity.NewSceneID()
+	cn.MarkSceneExplored(prereqID)
+	if !cn.CanAccessScene([][]identity.SceneID{{prereqID}}) {
+		t.Fatal("expected access with met prerequisite")
+	}
+}
+
+func TestCampaignNarrative_CanAccessScene_PrerequisiteNotMet(t *testing.T) {
+	cn, _, _ := CreateCampaignNarrative(identity.NewCampaignNarrativeID(), identity.NewCampaignID(), identity.NewGameID(), event.SourceGrimoire)
+	prereqID := identity.NewSceneID()
+	if cn.CanAccessScene([][]identity.SceneID{{prereqID}}) {
+		t.Fatal("expected no access with unmet prerequisite")
+	}
+}
+
+func TestCampaignNarrative_CanAccessScene_ORSets(t *testing.T) {
+	cn, _, _ := CreateCampaignNarrative(identity.NewCampaignNarrativeID(), identity.NewCampaignID(), identity.NewGameID(), event.SourceGrimoire)
+	pathA := identity.NewSceneID()
+	pathB := identity.NewSceneID()
+	cn.MarkSceneExplored(pathB)
+	// Two sets: {pathA} OR {pathB} — pathB is met
+	if !cn.CanAccessScene([][]identity.SceneID{{pathA}, {pathB}}) {
+		t.Fatal("expected access with one OR path met")
+	}
+}
+
 func TestCampaignNarrative_Snapshot_RoundTrips(t *testing.T) {
 	cn, _, _ := CreateCampaignNarrative(identity.NewCampaignNarrativeID(), identity.NewCampaignID(), identity.NewGameID(), event.SourceGrimoire)
 	beat, _, _ := CreateMasterBeat(identity.NewBeatID(), "Beat", value.BeatTypeRequired, identity.NewGameID(), event.SourceGrimoire)
 	cn.DiscoverBeat(beat)
+	cn.MarkSceneExplored(identity.NewSceneID())
+	cn.MarkLocationVisited(identity.NewLocationID())
 
 	snap := cn.Snapshot()
 	reconstituted := ReconstituteCampaignNarrative(snap)
@@ -159,5 +266,11 @@ func TestCampaignNarrative_Snapshot_RoundTrips(t *testing.T) {
 	}
 	if len(snap.DiscoveredBeatIDs) != len(snap2.DiscoveredBeatIDs) {
 		t.Fatal("DiscoveredBeatIDs length mismatch after round trip")
+	}
+	if len(snap.ExploredSceneIDs) != len(snap2.ExploredSceneIDs) {
+		t.Fatal("ExploredSceneIDs length mismatch after round trip")
+	}
+	if len(snap.VisitedLocationIDs) != len(snap2.VisitedLocationIDs) {
+		t.Fatal("VisitedLocationIDs length mismatch after round trip")
 	}
 }

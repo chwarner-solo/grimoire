@@ -12,10 +12,12 @@ import (
 // CampaignNarrative is purely additive — beats are discovered but never
 // un-discovered. There is no lifecycle state machine.
 type CampaignNarrative struct {
-	id                identity.CampaignNarrativeID
-	campaignID        identity.CampaignID
-	gameID            identity.GameID
-	discoveredBeatIDs []identity.BeatID
+	id                 identity.CampaignNarrativeID
+	campaignID         identity.CampaignID
+	gameID             identity.GameID
+	discoveredBeatIDs  []identity.BeatID
+	exploredSceneIDs   []identity.SceneID
+	visitedLocationIDs []identity.LocationID
 }
 
 // CreateCampaignNarrative constructs a new CampaignNarrative aggregate.
@@ -97,33 +99,132 @@ func (cn *CampaignNarrative) CampaignNarrativeID() identity.CampaignNarrativeID 
 func (cn *CampaignNarrative) CampaignID() identity.CampaignID                   { return cn.campaignID }
 func (cn *CampaignNarrative) GameID() identity.GameID                            { return cn.gameID }
 
+// ExploredSceneIDs returns a copy of the explored scene IDs.
+func (cn *CampaignNarrative) ExploredSceneIDs() []identity.SceneID {
+	ids := make([]identity.SceneID, len(cn.exploredSceneIDs))
+	copy(ids, cn.exploredSceneIDs)
+	return ids
+}
+
+// VisitedLocationIDs returns a copy of the visited location IDs.
+func (cn *CampaignNarrative) VisitedLocationIDs() []identity.LocationID {
+	ids := make([]identity.LocationID, len(cn.visitedLocationIDs))
+	copy(ids, cn.visitedLocationIDs)
+	return ids
+}
+
+// HasExploredScene returns true if the given scene has been explored.
+func (cn *CampaignNarrative) HasExploredScene(id identity.SceneID) bool {
+	for _, sid := range cn.exploredSceneIDs {
+		if sid.String() == id.String() {
+			return true
+		}
+	}
+	return false
+}
+
+// HasVisitedLocation returns true if the given location has been visited.
+func (cn *CampaignNarrative) HasVisitedLocation(id identity.LocationID) bool {
+	for _, lid := range cn.visitedLocationIDs {
+		if lid.String() == id.String() {
+			return true
+		}
+	}
+	return false
+}
+
+// CanAccessScene checks if the campaign has explored all scenes in at least
+// one complete prerequisite set.
+func (cn *CampaignNarrative) CanAccessScene(prerequisiteSets [][]identity.SceneID) bool {
+	if len(prerequisiteSets) == 0 {
+		return true
+	}
+	for _, set := range prerequisiteSets {
+		if cn.allScenesExplored(set) {
+			return true
+		}
+	}
+	return false
+}
+
+func (cn *CampaignNarrative) allScenesExplored(sceneIDs []identity.SceneID) bool {
+	for _, id := range sceneIDs {
+		if !cn.HasExploredScene(id) {
+			return false
+		}
+	}
+	return true
+}
+
+// MarkSceneExplored records that this campaign has explored the given scene.
+func (cn *CampaignNarrative) MarkSceneExplored(sceneID identity.SceneID) ([]event.Event, error) {
+	if cn.HasExploredScene(sceneID) {
+		return nil, nil
+	}
+	cn.exploredSceneIDs = append(cn.exploredSceneIDs, sceneID)
+	evt := event.EntityLinked{
+		EntityAID:    cn.id.String(),
+		EntityBID:    sceneID.String(),
+		Relationship: "explored",
+	}
+	return []event.Event{evt}, nil
+}
+
+// MarkLocationVisited records that this campaign has visited the given location.
+func (cn *CampaignNarrative) MarkLocationVisited(locationID identity.LocationID) ([]event.Event, error) {
+	if cn.HasVisitedLocation(locationID) {
+		return nil, nil
+	}
+	cn.visitedLocationIDs = append(cn.visitedLocationIDs, locationID)
+	evt := event.EntityLinked{
+		EntityAID:    cn.id.String(),
+		EntityBID:    locationID.String(),
+		Relationship: "visited",
+	}
+	return []event.Event{evt}, nil
+}
+
 // --- Snapshot / Reconstitute ---
 
 type CampaignNarrativeSnapshot struct {
-	ID                identity.CampaignNarrativeID
-	CampaignID        identity.CampaignID
-	GameID            identity.GameID
-	DiscoveredBeatIDs []identity.BeatID
+	ID                 identity.CampaignNarrativeID
+	CampaignID         identity.CampaignID
+	GameID             identity.GameID
+	DiscoveredBeatIDs  []identity.BeatID
+	ExploredSceneIDs   []identity.SceneID
+	VisitedLocationIDs []identity.LocationID
 }
 
 func (cn *CampaignNarrative) Snapshot() CampaignNarrativeSnapshot {
-	ids := make([]identity.BeatID, len(cn.discoveredBeatIDs))
-	copy(ids, cn.discoveredBeatIDs)
+	beatIDs := make([]identity.BeatID, len(cn.discoveredBeatIDs))
+	copy(beatIDs, cn.discoveredBeatIDs)
+	sceneIDs := make([]identity.SceneID, len(cn.exploredSceneIDs))
+	copy(sceneIDs, cn.exploredSceneIDs)
+	locIDs := make([]identity.LocationID, len(cn.visitedLocationIDs))
+	copy(locIDs, cn.visitedLocationIDs)
 	return CampaignNarrativeSnapshot{
-		ID:                cn.id,
-		CampaignID:        cn.campaignID,
-		GameID:            cn.gameID,
-		DiscoveredBeatIDs: ids,
+		ID:                 cn.id,
+		CampaignID:         cn.campaignID,
+		GameID:             cn.gameID,
+		DiscoveredBeatIDs:  beatIDs,
+		ExploredSceneIDs:   sceneIDs,
+		VisitedLocationIDs: locIDs,
 	}
 }
 
 func ReconstituteCampaignNarrative(snap CampaignNarrativeSnapshot) *CampaignNarrative {
-	ids := make([]identity.BeatID, len(snap.DiscoveredBeatIDs))
-	copy(ids, snap.DiscoveredBeatIDs)
+	beatIDs := make([]identity.BeatID, len(snap.DiscoveredBeatIDs))
+	copy(beatIDs, snap.DiscoveredBeatIDs)
+	sceneIDs := make([]identity.SceneID, len(snap.ExploredSceneIDs))
+	copy(sceneIDs, snap.ExploredSceneIDs)
+	locIDs := make([]identity.LocationID, len(snap.VisitedLocationIDs))
+	copy(locIDs, snap.VisitedLocationIDs)
 	return &CampaignNarrative{
-		id:                snap.ID,
-		campaignID:        snap.CampaignID,
-		gameID:            snap.GameID,
-		discoveredBeatIDs: ids,
+		id:                 snap.ID,
+		campaignID:         snap.CampaignID,
+		gameID:             snap.GameID,
+		discoveredBeatIDs:  beatIDs,
+		exploredSceneIDs:   sceneIDs,
+		visitedLocationIDs: locIDs,
 	}
 }
