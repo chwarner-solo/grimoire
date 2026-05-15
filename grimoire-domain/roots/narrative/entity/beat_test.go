@@ -155,6 +155,67 @@ func TestBeat_WouldCreateCycle_AllowsValidPrerequisite(t *testing.T) {
 	}
 }
 
+// --- CreateCharacterBeat tests ---
+
+func TestCreateCharacterBeat_ValidInputs(t *testing.T) {
+	id := identity.NewBeatID()
+	gameID := identity.NewGameID()
+	charID := identity.NewPlayerCharacterID()
+	beat, events, err := CreateCharacterBeat(id, "Village Burned", value.BeatTypeBackground, gameID, charID, event.SourceGrimoire)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if beat.Scope() != value.BeatScopeCharacter {
+		t.Fatalf("expected scope character, got %q", beat.Scope())
+	}
+	if beat.BeatType() != value.BeatTypeBackground {
+		t.Fatalf("expected beat type background, got %q", beat.BeatType())
+	}
+	if beat.CharacterID().String() != charID.String() {
+		t.Fatalf("expected character ID %s, got %s", charID, beat.CharacterID())
+	}
+	if len(events) != 1 {
+		t.Fatalf("expected 1 event, got %d", len(events))
+	}
+}
+
+func TestCreateCharacterBeat_RequiresCharacterID(t *testing.T) {
+	_, _, err := CreateCharacterBeat(identity.NewBeatID(), "Name", value.BeatTypeBackground, identity.NewGameID(), identity.PlayerCharacterID{}, event.SourceGrimoire)
+	if !errors.Is(err, ErrCharacterIDRequired) {
+		t.Fatalf("expected ErrCharacterIDRequired, got: %v", err)
+	}
+}
+
+func TestCreateCharacterBeat_RejectsInvalidBeatType(t *testing.T) {
+	_, _, err := CreateCharacterBeat(identity.NewBeatID(), "Name", value.BeatTypeRequired, identity.NewGameID(), identity.NewPlayerCharacterID(), event.SourceGrimoire)
+	if !errors.Is(err, ErrInvalidBeatTypeForCharacterScope) {
+		t.Fatalf("expected ErrInvalidBeatTypeForCharacterScope, got: %v", err)
+	}
+}
+
+func TestCreateCharacterBeat_AcceptsPersonalArc(t *testing.T) {
+	beat, _, err := CreateCharacterBeat(identity.NewBeatID(), "Name", value.BeatTypePersonalArc, identity.NewGameID(), identity.NewPlayerCharacterID(), event.SourceGrimoire)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if beat.BeatType() != value.BeatTypePersonalArc {
+		t.Fatalf("expected personal-arc, got %q", beat.BeatType())
+	}
+}
+
+func TestCharacterBeat_Snapshot_RoundTrips_CharacterID(t *testing.T) {
+	charID := identity.NewPlayerCharacterID()
+	beat, _, _ := CreateCharacterBeat(identity.NewBeatID(), "Beat", value.BeatTypeBackground, identity.NewGameID(), charID, event.SourceGrimoire)
+	snap := beat.Snapshot()
+	reconstituted := ReconstituteBeat(snap)
+	if reconstituted.CharacterID().String() != charID.String() {
+		t.Fatal("CharacterID mismatch after round trip")
+	}
+	if reconstituted.Scope() != value.BeatScopeCharacter {
+		t.Fatal("Scope mismatch after round trip")
+	}
+}
+
 func TestBeat_AddPrerequisite_AppendsToFirstSet(t *testing.T) {
 	beat, _, _ := CreateMasterBeat(identity.NewBeatID(), "Beat", value.BeatTypeRequired, identity.NewGameID(), event.SourceGrimoire)
 	prereqID := identity.NewBeatID()

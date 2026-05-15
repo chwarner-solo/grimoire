@@ -12,7 +12,7 @@ func TestNewFactionMembership_ValidInputs_Succeeds(t *testing.T) {
 	m, err := entity.NewFactionMembership(
 		identity.NewFactionMembershipID(),
 		identity.NewFactionID(),
-		identity.NewCharacterID(),
+		identity.NewNarrativeCharacterID(),
 		"Grunt",
 	)
 	if err != nil {
@@ -25,7 +25,7 @@ func TestNewFactionMembership_ValidInputs_Succeeds(t *testing.T) {
 
 func TestNewFactionMembership_RequiresNonZeroMembershipID(t *testing.T) {
 	var zeroID identity.FactionMembershipID
-	_, err := entity.NewFactionMembership(zeroID, identity.NewFactionID(), identity.NewCharacterID(), "Grunt")
+	_, err := entity.NewFactionMembership(zeroID, identity.NewFactionID(), identity.NewNarrativeCharacterID(), "Grunt")
 	if !errors.Is(err, entity.ErrMembershipIDRequired) {
 		t.Fatalf("expected ErrMembershipIDRequired, got %v", err)
 	}
@@ -33,14 +33,14 @@ func TestNewFactionMembership_RequiresNonZeroMembershipID(t *testing.T) {
 
 func TestNewFactionMembership_RequiresNonZeroFactionID(t *testing.T) {
 	var zeroID identity.FactionID
-	_, err := entity.NewFactionMembership(identity.NewFactionMembershipID(), zeroID, identity.NewCharacterID(), "Grunt")
+	_, err := entity.NewFactionMembership(identity.NewFactionMembershipID(), zeroID, identity.NewNarrativeCharacterID(), "Grunt")
 	if !errors.Is(err, entity.ErrFactionIDRequired) {
 		t.Fatalf("expected ErrFactionIDRequired, got %v", err)
 	}
 }
 
 func TestNewFactionMembership_RequiresNonZeroCharacterID(t *testing.T) {
-	var zeroID identity.CharacterID
+	var zeroID identity.NarrativeCharacterID
 	_, err := entity.NewFactionMembership(identity.NewFactionMembershipID(), identity.NewFactionID(), zeroID, "Grunt")
 	if !errors.Is(err, entity.ErrCharacterIDRequired) {
 		t.Fatalf("expected ErrCharacterIDRequired, got %v", err)
@@ -48,21 +48,21 @@ func TestNewFactionMembership_RequiresNonZeroCharacterID(t *testing.T) {
 }
 
 func TestNewFactionMembership_RequiresNonEmptyRank(t *testing.T) {
-	_, err := entity.NewFactionMembership(identity.NewFactionMembershipID(), identity.NewFactionID(), identity.NewCharacterID(), "")
+	_, err := entity.NewFactionMembership(identity.NewFactionMembershipID(), identity.NewFactionID(), identity.NewNarrativeCharacterID(), "")
 	if !errors.Is(err, entity.ErrRankRequired) {
 		t.Fatalf("expected ErrRankRequired, got %v", err)
 	}
 }
 
 func TestNewFactionMembership_DefaultsPlayerVisibleFalse(t *testing.T) {
-	m, _ := entity.NewFactionMembership(identity.NewFactionMembershipID(), identity.NewFactionID(), identity.NewCharacterID(), "Elder")
+	m, _ := entity.NewFactionMembership(identity.NewFactionMembershipID(), identity.NewFactionID(), identity.NewNarrativeCharacterID(), "Elder")
 	if m.IsPlayerVisible() {
 		t.Fatal("expected playerVisible to default to false")
 	}
 }
 
 func TestFactionMembership_Reveal_SetsPlayerVisible(t *testing.T) {
-	m, _ := entity.NewFactionMembership(identity.NewFactionMembershipID(), identity.NewFactionID(), identity.NewCharacterID(), "Elder")
+	m, _ := entity.NewFactionMembership(identity.NewFactionMembershipID(), identity.NewFactionID(), identity.NewNarrativeCharacterID(), "Elder")
 	m.Reveal()
 	if !m.IsPlayerVisible() {
 		t.Fatal("expected playerVisible to be true after Reveal")
@@ -70,7 +70,7 @@ func TestFactionMembership_Reveal_SetsPlayerVisible(t *testing.T) {
 }
 
 func TestFactionMembership_Snapshot_Roundtrip(t *testing.T) {
-	m, _ := entity.NewFactionMembership(identity.NewFactionMembershipID(), identity.NewFactionID(), identity.NewCharacterID(), "Inquisitor")
+	m, _ := entity.NewFactionMembership(identity.NewFactionMembershipID(), identity.NewFactionID(), identity.NewNarrativeCharacterID(), "Inquisitor")
 	m.Reveal()
 	snap := m.Snapshot()
 

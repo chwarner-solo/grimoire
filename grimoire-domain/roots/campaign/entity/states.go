@@ -22,7 +22,7 @@ type Campaign interface {
 // Characters can be added and the GM can begin formation.
 type NewCampaign interface {
 	Campaign
-	AddCharacter(id identity.CharacterID, source event.Source) (NewCampaign, []event.Event, error)
+	AddCharacter(id identity.PlayerCharacterID, source event.Source) (NewCampaign, []event.Event, error)
 	BeginFormation(source event.Source) (FormingCampaign, []event.Event, error)
 }
 
@@ -30,7 +30,7 @@ type NewCampaign interface {
 // Characters can still be added, and the first session can start if at least one character exists.
 type FormingCampaign interface {
 	Campaign
-	AddCharacter(id identity.CharacterID, source event.Source) (FormingCampaign, []event.Event, error)
+	AddCharacter(id identity.PlayerCharacterID, source event.Source) (FormingCampaign, []event.Event, error)
 	StartFirstSession(id identity.SessionID, date time.Time) (ActiveCampaign, []event.Event, error)
 }
 

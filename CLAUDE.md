@@ -131,13 +131,16 @@ grimoire-api            →  grimoire-domain + grimoire-infrastructure
 ## Aggregate Roots
 
 ```
-Game              →  the world, canonical GM content
-Campaign          →  a table running a Game
-Character         →  PC or NPC
-Location          →  places in the world
-MasterNarrative   →  canonical story DAG, beats, acts, secrets, lore (Game-owned)
-CampaignNarrative →  a Campaign's path through the story DAG (Campaign-owned)
-Faction           →  groups, allegiances, goals
+Game                       →  the world, canonical GM content
+Campaign                   →  a table running a Game
+NPC (NarrativeCharacter)   →  GM-controlled characters (ADR-019)
+PlayerCharacter            →  player-owned characters (ADR-019)
+PlayerCharacterNarrative   →  a PC's narrative journal per Campaign (ADR-019)
+MacGuffin                  →  narratively significant items (ADR-019)
+Location                   →  places in the world
+MasterNarrative            →  canonical story DAG, beats, acts, secrets, lore (Game-owned)
+CampaignNarrative          →  a Campaign's path through the story DAG (Campaign-owned)
+Faction                    →  groups, allegiances, goals
 ```
 
 The Narrative subsystem is two aggregates that collaborate (ADR-016):
@@ -148,6 +151,18 @@ The Narrative subsystem is two aggregates that collaborate (ADR-016):
 (name, description, playerDescription) lives in Neo4j only. Command side
 (Firestore) holds only structural fields: IDs, type, scope, prerequisite sets.
 Events carry all fields; GCS preserves full content for Neo4j rebuilds.
+Beat has three scopes: master, campaign, and character (ADR-019).
+
+The Character subsystem is four aggregates (ADR-019):
+- **NPC** — GM-controlled world entity, full lifecycle state machine (New → Draft → Active → Idle → Archived)
+- **PlayerCharacter** — player-owned, simpler lifecycle (Active → Retired)
+- **PlayerCharacterNarrative** — purely additive journal per campaign, same pattern as CampaignNarrative
+- **MacGuffin** — narratively significant item; possessed XOR at location XOR lost
+
+Grimoire does NOT model HP, inventory, wealth, or mechanical state.
+The domain filter: does it affect the story? If yes, Grimoire owns it.
+MacGuffin is the sole "item" concept — Grimoire tracks possession because
+it drives narrative consequences. foundryCharacterID is the only mechanical coupling.
 
 Each root owns its lifecycle. No root reaches into another root.
 Cross-root references use typed IDs only — never navigation.
@@ -184,6 +199,25 @@ New → InProgress → Completed → Summarized → Idle
 - InProgress → Completed: GM ends session
 - Completed → Summarized: recap/notes written
 - Summarized → Idle: closed out (terminal)
+
+### NPC (ADR-019)
+```
+New → Draft → Active → Idle → Archived
+```
+- New → Draft: always allowed
+- Draft → Active: GUARD: name not empty, description not empty
+- Active → Idle: GM marks dormant
+- Idle → Active: GM reactivates
+- Active → Archived: GM retires (terminal)
+- Idle → Archived: GM retires (terminal)
+- On archive: MacGuffins drop to NPC's last known location (EventBus handler)
+
+### PlayerCharacter (ADR-019)
+```
+Active → Retired
+```
+- Active on creation (no Draft state)
+- Active → Retired: player leaves or campaign completes (terminal)
 
 ---
 
@@ -285,5 +319,6 @@ type EventEnvelope struct {
 | ADR-016 | Narrative Aggregate Architecture — Authoritative Record |
 | ADR-017 | Faction Aggregate Architecture |
 | ADR-018 | Location Aggregate Architecture |
+| ADR-019 | Character Aggregate Architecture |
 
 See `docs/adr/` for full records.

@@ -16,7 +16,7 @@ func (c *newCampaign) Handle(evt event.Event) (Campaign, error) {
 		if e.Relationship != "character" {
 			return nil, ErrUnexpectedEvent
 		}
-		charID, err := identity.ParseCharacterID(e.EntityBID)
+		charID, err := identity.ParsePlayerCharacterID(e.EntityBID)
 		if err != nil {
 			return nil, fmt.Errorf("campaign handle: %w", err)
 		}
@@ -42,7 +42,7 @@ func (c *formingCampaign) Handle(evt event.Event) (Campaign, error) {
 		if e.Relationship != "character" {
 			return nil, ErrUnexpectedEvent
 		}
-		charID, err := identity.ParseCharacterID(e.EntityBID)
+		charID, err := identity.ParsePlayerCharacterID(e.EntityBID)
 		if err != nil {
 			return nil, fmt.Errorf("campaign handle: %w", err)
 		}
@@ -109,7 +109,7 @@ func (c *completeCampaign) Handle(_ event.Event) (Campaign, error) {
 // --- copyCore ---
 
 func (c *campaignCore) copyCore() campaignCore {
-	ids := make([]identity.CharacterID, len(c.characterIDs))
+	ids := make([]identity.PlayerCharacterID, len(c.characterIDs))
 	copy(ids, c.characterIDs)
 	return campaignCore{
 		id:                c.id,

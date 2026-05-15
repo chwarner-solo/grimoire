@@ -26,7 +26,7 @@ func formingCampaignForHandle(t *testing.T) entity.Campaign {
 	c := newCampaignForHandle(t)
 	// Add a character first
 	c2, err := c.Handle(event.EntityLinked{
-		EntityAID: c.CampaignID().String(), EntityBID: identity.NewCharacterID().String(),
+		EntityAID: c.CampaignID().String(), EntityBID: identity.NewPlayerCharacterID().String(),
 		Relationship: "character", Source: event.SourceGrimoire,
 	})
 	if err != nil {
@@ -72,7 +72,7 @@ func TestHandle_NewCampaign_EntityLinked_AddsCharacter(t *testing.T) {
 	c := newCampaignForHandle(t)
 	result, err := c.Handle(event.EntityLinked{
 		EntityAID:    c.CampaignID().String(),
-		EntityBID:    identity.NewCharacterID().String(),
+		EntityBID:    identity.NewPlayerCharacterID().String(),
 		Relationship: "character",
 		Source:       event.SourceGrimoire,
 	})
@@ -116,7 +116,7 @@ func TestHandle_FormingCampaign_EntityLinked_AddsCharacter(t *testing.T) {
 	c := formingCampaignForHandle(t)
 	result, err := c.Handle(event.EntityLinked{
 		EntityAID:    c.CampaignID().String(),
-		EntityBID:    identity.NewCharacterID().String(),
+		EntityBID:    identity.NewPlayerCharacterID().String(),
 		Relationship: "character",
 		Source:       event.SourceGrimoire,
 	})
@@ -252,7 +252,7 @@ func TestHandle_Campaign_Immutability_OriginalUnchanged(t *testing.T) {
 func TestReplayCampaign_FullLifecycle(t *testing.T) {
 	campID := identity.NewCampaignID()
 	gameID := identity.NewGameID()
-	charID := identity.NewCharacterID()
+	charID := identity.NewPlayerCharacterID()
 	sessID := identity.NewSessionID()
 	locID := identity.NewLocationID()
 

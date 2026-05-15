@@ -38,7 +38,10 @@ func (id *EventID) UnmarshalJSON(data []byte) error {
 type GameID struct{ GrimoireID }
 type CampaignID struct{ GrimoireID }
 type SessionID struct{ GrimoireID }
-type CharacterID struct{ GrimoireID }
+type NarrativeCharacterID struct{ GrimoireID }
+type PlayerCharacterID struct{ GrimoireID }
+type PlayerCharacterNarrativeID struct{ GrimoireID }
+type MacGuffinID struct{ GrimoireID }
 type LocationID struct{ GrimoireID }
 type FactionID struct{ GrimoireID }
 type FactionMembershipID struct{ GrimoireID }
@@ -88,16 +91,52 @@ func ParseSessionID(s string) (SessionID, error) {
 	return SessionID{base}, nil
 }
 
-func NewCharacterID() CharacterID {
-	return CharacterID{NewGrimoireID()}
+func NewNarrativeCharacterID() NarrativeCharacterID {
+	return NarrativeCharacterID{NewGrimoireID()}
 }
 
-func ParseCharacterID(s string) (CharacterID, error) {
+func ParseNarrativeCharacterID(s string) (NarrativeCharacterID, error) {
 	base, err := ParseGrimoireID(s)
 	if err != nil {
-		return CharacterID{}, err
+		return NarrativeCharacterID{}, err
 	}
-	return CharacterID{base}, nil
+	return NarrativeCharacterID{base}, nil
+}
+
+func NewPlayerCharacterID() PlayerCharacterID {
+	return PlayerCharacterID{NewGrimoireID()}
+}
+
+func ParsePlayerCharacterID(s string) (PlayerCharacterID, error) {
+	base, err := ParseGrimoireID(s)
+	if err != nil {
+		return PlayerCharacterID{}, err
+	}
+	return PlayerCharacterID{base}, nil
+}
+
+func NewPlayerCharacterNarrativeID() PlayerCharacterNarrativeID {
+	return PlayerCharacterNarrativeID{NewGrimoireID()}
+}
+
+func ParsePlayerCharacterNarrativeID(s string) (PlayerCharacterNarrativeID, error) {
+	base, err := ParseGrimoireID(s)
+	if err != nil {
+		return PlayerCharacterNarrativeID{}, err
+	}
+	return PlayerCharacterNarrativeID{base}, nil
+}
+
+func NewMacGuffinID() MacGuffinID {
+	return MacGuffinID{NewGrimoireID()}
+}
+
+func ParseMacGuffinID(s string) (MacGuffinID, error) {
+	base, err := ParseGrimoireID(s)
+	if err != nil {
+		return MacGuffinID{}, err
+	}
+	return MacGuffinID{base}, nil
 }
 
 func NewLocationID() LocationID {

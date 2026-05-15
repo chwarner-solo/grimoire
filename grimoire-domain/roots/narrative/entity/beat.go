@@ -22,7 +22,8 @@ type Beat struct {
 	status            value.BeatStatus
 	gameID            identity.GameID
 	campaignID        identity.CampaignID
-	prerequisiteSets  [][]identity.BeatID // OR-of-ANDs: any complete set satisfies
+	characterID       identity.PlayerCharacterID // IsZero() unless scope is character
+	prerequisiteSets  [][]identity.BeatID        // OR-of-ANDs: any complete set satisfies
 }
 
 // CreateMasterBeat constructs a new Beat with master scope.
@@ -75,6 +76,42 @@ func CreateCampaignBeat(id identity.BeatID, name string, gameID identity.GameID,
 		status:     value.BeatStatusDraft,
 		gameID:     gameID,
 		campaignID: campaignID,
+	}
+	evt := event.EntityCreated{
+		EntityID:   id.String(),
+		EntityType: "beat",
+		Name:       name,
+		Source:     source,
+	}
+	return beat, []event.Event{evt}, nil
+}
+
+// CreateCharacterBeat constructs a new Beat scoped to a specific PlayerCharacter.
+// beatType must be BeatTypeBackground or BeatTypePersonalArc.
+func CreateCharacterBeat(id identity.BeatID, name string, beatType value.BeatType, gameID identity.GameID, characterID identity.PlayerCharacterID, source event.Source) (*Beat, []event.Event, error) {
+	if id.IsZero() {
+		return nil, nil, ErrBeatIDRequired
+	}
+	if strings.TrimSpace(name) == "" {
+		return nil, nil, ErrBeatNameRequired
+	}
+	if gameID.IsZero() {
+		return nil, nil, ErrGameIDRequired
+	}
+	if characterID.IsZero() {
+		return nil, nil, ErrCharacterIDRequired
+	}
+	if beatType != value.BeatTypeBackground && beatType != value.BeatTypePersonalArc {
+		return nil, nil, ErrInvalidBeatTypeForCharacterScope
+	}
+	beat := &Beat{
+		id:          id,
+		name:        name,
+		scope:       value.BeatScopeCharacter,
+		beatType:    beatType,
+		status:      value.BeatStatusDraft,
+		gameID:      gameID,
+		characterID: characterID,
 	}
 	evt := event.EntityCreated{
 		EntityID:   id.String(),
@@ -144,7 +181,8 @@ func (b *Beat) Scope() value.BeatScope            { return b.scope }
 func (b *Beat) BeatType() value.BeatType          { return b.beatType }
 func (b *Beat) Status() value.BeatStatus          { return b.status }
 func (b *Beat) GameID() identity.GameID           { return b.gameID }
-func (b *Beat) CampaignID() identity.CampaignID   { return b.campaignID }
+func (b *Beat) CampaignID() identity.CampaignID              { return b.campaignID }
+func (b *Beat) CharacterID() identity.PlayerCharacterID       { return b.characterID }
 func (b *Beat) PrerequisiteSets() [][]identity.BeatID {
 	result := make([][]identity.BeatID, len(b.prerequisiteSets))
 	for i, set := range b.prerequisiteSets {
@@ -168,6 +206,7 @@ type BeatSnapshot struct {
 	Status            value.BeatStatus
 	GameID            identity.GameID
 	CampaignID        identity.CampaignID
+	CharacterID       identity.PlayerCharacterID
 	PrerequisiteSets  [][]identity.BeatID
 }
 
@@ -182,6 +221,7 @@ func (b *Beat) Snapshot() BeatSnapshot {
 		Status:            b.status,
 		GameID:            b.gameID,
 		CampaignID:        b.campaignID,
+		CharacterID:       b.characterID,
 		PrerequisiteSets:  b.PrerequisiteSets(),
 	}
 }
@@ -204,6 +244,7 @@ func ReconstituteBeat(snap BeatSnapshot) *Beat {
 		status:            snap.Status,
 		gameID:            snap.GameID,
 		campaignID:        snap.CampaignID,
+		characterID:       snap.CharacterID,
 		prerequisiteSets:  sets,
 	}
 }

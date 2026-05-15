@@ -17,6 +17,8 @@ var (
 	ErrMasterNarrativeIDRequired       = errors.New("narrative: master narrative id is required")
 	ErrCampaignNarrativeIDRequired     = errors.New("narrative: campaign narrative id is required")
 	ErrInvalidScope                    = errors.New("narrative: invalid scope")
+	ErrCharacterIDRequired             = errors.New("narrative: character id is required")
+	ErrInvalidBeatTypeForCharacterScope = errors.New("narrative: beat type must be background or personal-arc for character scope")
 )
 
 // ErrCycleDetected indicates that adding a prerequisite would create a cycle in the beat DAG.

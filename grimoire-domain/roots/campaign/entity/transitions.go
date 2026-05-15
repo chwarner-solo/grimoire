@@ -9,7 +9,7 @@ import (
 
 // --- NewCampaign transitions ---
 
-func (c *newCampaign) AddCharacter(id identity.CharacterID, source event.Source) (NewCampaign, []event.Event, error) {
+func (c *newCampaign) AddCharacter(id identity.PlayerCharacterID, source event.Source) (NewCampaign, []event.Event, error) {
 	if err := validateCharacterID(id); err != nil {
 		return nil, nil, err
 	}
@@ -39,7 +39,7 @@ func (c *newCampaign) BeginFormation(source event.Source) (FormingCampaign, []ev
 
 // --- FormingCampaign transitions ---
 
-func (c *formingCampaign) AddCharacter(id identity.CharacterID, source event.Source) (FormingCampaign, []event.Event, error) {
+func (c *formingCampaign) AddCharacter(id identity.PlayerCharacterID, source event.Source) (FormingCampaign, []event.Event, error) {
 	if err := validateCharacterID(id); err != nil {
 		return nil, nil, err
 	}
@@ -123,7 +123,7 @@ func (c *idleCampaign) Complete(source event.Source) (CompleteCampaign, []event.
 
 // --- Helpers ---
 
-func validateCharacterID(id identity.CharacterID) error {
+func validateCharacterID(id identity.PlayerCharacterID) error {
 	if id.IsZero() {
 		return ErrCharacterIDRequired
 	}

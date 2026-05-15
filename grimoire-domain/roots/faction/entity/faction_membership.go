@@ -11,14 +11,14 @@ import (
 type FactionMembership struct {
 	id            identity.FactionMembershipID
 	factionID     identity.FactionID
-	characterID   identity.CharacterID
+	characterID   identity.NarrativeCharacterID
 	rank          string
 	playerVisible bool
 }
 
 // NewFactionMembership constructs a FactionMembership with validation.
 // playerVisible defaults to false.
-func NewFactionMembership(id identity.FactionMembershipID, factionID identity.FactionID, characterID identity.CharacterID, rank string) (*FactionMembership, error) {
+func NewFactionMembership(id identity.FactionMembershipID, factionID identity.FactionID, characterID identity.NarrativeCharacterID, rank string) (*FactionMembership, error) {
 	if id.IsZero() {
 		return nil, ErrMembershipIDRequired
 	}
@@ -42,7 +42,7 @@ func NewFactionMembership(id identity.FactionMembershipID, factionID identity.Fa
 
 func (m *FactionMembership) MembershipID() identity.FactionMembershipID { return m.id }
 func (m *FactionMembership) FactionID() identity.FactionID              { return m.factionID }
-func (m *FactionMembership) CharacterID() identity.CharacterID          { return m.characterID }
+func (m *FactionMembership) CharacterID() identity.NarrativeCharacterID          { return m.characterID }
 func (m *FactionMembership) Rank() string                               { return m.rank }
 func (m *FactionMembership) IsPlayerVisible() bool                      { return m.playerVisible }
 
@@ -55,7 +55,7 @@ func (m *FactionMembership) Reveal() {
 type FactionMembershipSnapshot struct {
 	ID            identity.FactionMembershipID
 	FactionID     identity.FactionID
-	CharacterID   identity.CharacterID
+	CharacterID   identity.NarrativeCharacterID
 	Rank          string
 	PlayerVisible bool
 }

@@ -12,7 +12,7 @@ type CampaignSnapshot struct {
 	Name              string
 	GameID            identity.GameID
 	State             string
-	CharacterIDs      []identity.CharacterID
+	CharacterIDs      []identity.PlayerCharacterID
 	CurrentLocationID identity.LocationID
 }
 

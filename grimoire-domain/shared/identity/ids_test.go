@@ -55,9 +55,9 @@ func TestSessionID_NewIsNotZero(t *testing.T) {
 	}
 }
 
-func TestCharacterID_NewAndParse_Roundtrip(t *testing.T) {
-	id := NewCharacterID()
-	parsed, err := ParseCharacterID(id.String())
+func TestNarrativeCharacterID_NewAndParse_Roundtrip(t *testing.T) {
+	id := NewNarrativeCharacterID()
+	parsed, err := ParseNarrativeCharacterID(id.String())
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -66,9 +66,88 @@ func TestCharacterID_NewAndParse_Roundtrip(t *testing.T) {
 	}
 }
 
-func TestCharacterID_NewIsNotZero(t *testing.T) {
-	if NewCharacterID().IsZero() {
-		t.Fatal("new CharacterID should not be zero")
+func TestNarrativeCharacterID_NewIsNotZero(t *testing.T) {
+	if NewNarrativeCharacterID().IsZero() {
+		t.Fatal("new NarrativeCharacterID should not be zero")
+	}
+}
+
+func TestNarrativeCharacterID_ZeroValue_IsZero(t *testing.T) {
+	var id NarrativeCharacterID
+	if !id.IsZero() {
+		t.Fatal("zero-value NarrativeCharacterID should be zero")
+	}
+}
+
+func TestPlayerCharacterID_NewAndParse_Roundtrip(t *testing.T) {
+	id := NewPlayerCharacterID()
+	parsed, err := ParsePlayerCharacterID(id.String())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if parsed.String() != id.String() {
+		t.Fatalf("expected %s, got %s", id, parsed)
+	}
+}
+
+func TestPlayerCharacterID_NewIsNotZero(t *testing.T) {
+	if NewPlayerCharacterID().IsZero() {
+		t.Fatal("new PlayerCharacterID should not be zero")
+	}
+}
+
+func TestPlayerCharacterID_ZeroValue_IsZero(t *testing.T) {
+	var id PlayerCharacterID
+	if !id.IsZero() {
+		t.Fatal("zero-value PlayerCharacterID should be zero")
+	}
+}
+
+func TestPlayerCharacterNarrativeID_NewAndParse_Roundtrip(t *testing.T) {
+	id := NewPlayerCharacterNarrativeID()
+	parsed, err := ParsePlayerCharacterNarrativeID(id.String())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if parsed.String() != id.String() {
+		t.Fatalf("expected %s, got %s", id, parsed)
+	}
+}
+
+func TestPlayerCharacterNarrativeID_NewIsNotZero(t *testing.T) {
+	if NewPlayerCharacterNarrativeID().IsZero() {
+		t.Fatal("new PlayerCharacterNarrativeID should not be zero")
+	}
+}
+
+func TestPlayerCharacterNarrativeID_ZeroValue_IsZero(t *testing.T) {
+	var id PlayerCharacterNarrativeID
+	if !id.IsZero() {
+		t.Fatal("zero-value PlayerCharacterNarrativeID should be zero")
+	}
+}
+
+func TestMacGuffinID_NewAndParse_Roundtrip(t *testing.T) {
+	id := NewMacGuffinID()
+	parsed, err := ParseMacGuffinID(id.String())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if parsed.String() != id.String() {
+		t.Fatalf("expected %s, got %s", id, parsed)
+	}
+}
+
+func TestMacGuffinID_NewIsNotZero(t *testing.T) {
+	if NewMacGuffinID().IsZero() {
+		t.Fatal("new MacGuffinID should not be zero")
+	}
+}
+
+func TestMacGuffinID_ZeroValue_IsZero(t *testing.T) {
+	var id MacGuffinID
+	if !id.IsZero() {
+		t.Fatal("zero-value MacGuffinID should be zero")
 	}
 }
 
@@ -321,8 +400,29 @@ func TestParseSessionID_InvalidInput_ReturnsError(t *testing.T) {
 	}
 }
 
-func TestParseCharacterID_InvalidInput_ReturnsError(t *testing.T) {
-	_, err := ParseCharacterID("not-valid")
+func TestParseNarrativeCharacterID_InvalidInput_ReturnsError(t *testing.T) {
+	_, err := ParseNarrativeCharacterID("not-valid")
+	if err == nil {
+		t.Fatal("expected error for invalid input")
+	}
+}
+
+func TestParsePlayerCharacterID_InvalidInput_ReturnsError(t *testing.T) {
+	_, err := ParsePlayerCharacterID("not-valid")
+	if err == nil {
+		t.Fatal("expected error for invalid input")
+	}
+}
+
+func TestParsePlayerCharacterNarrativeID_InvalidInput_ReturnsError(t *testing.T) {
+	_, err := ParsePlayerCharacterNarrativeID("not-valid")
+	if err == nil {
+		t.Fatal("expected error for invalid input")
+	}
+}
+
+func TestParseMacGuffinID_InvalidInput_ReturnsError(t *testing.T) {
+	_, err := ParseMacGuffinID("not-valid")
 	if err == nil {
 		t.Fatal("expected error for invalid input")
 	}

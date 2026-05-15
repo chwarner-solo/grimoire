@@ -12,7 +12,7 @@ type campaignCore struct {
 	id                identity.CampaignID
 	name              string
 	gameID            identity.GameID
-	characterIDs      []identity.CharacterID
+	characterIDs      []identity.PlayerCharacterID
 	currentLocationID identity.LocationID
 }
 
@@ -21,7 +21,7 @@ func (c *campaignCore) CampaignName() string                    { return c.name 
 func (c *campaignCore) CurrentLocationID() identity.LocationID  { return c.currentLocationID }
 func (c *campaignCore) isCampaign()                             {}
 
-func (c *campaignCore) hasCharacter(id identity.CharacterID) bool {
+func (c *campaignCore) hasCharacter(id identity.PlayerCharacterID) bool {
 	for _, cid := range c.characterIDs {
 		if cid.String() == id.String() {
 			return true
@@ -31,7 +31,7 @@ func (c *campaignCore) hasCharacter(id identity.CharacterID) bool {
 }
 
 func (c *campaignCore) snapshot(state string) CampaignSnapshot {
-	ids := make([]identity.CharacterID, len(c.characterIDs))
+	ids := make([]identity.PlayerCharacterID, len(c.characterIDs))
 	copy(ids, c.characterIDs)
 	return CampaignSnapshot{
 		ID:                c.id,

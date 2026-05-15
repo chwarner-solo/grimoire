@@ -31,7 +31,7 @@ func TestReconstituteCampaign_FormingState(t *testing.T) {
 		Name:         "Test Campaign",
 		GameID:       identity.NewGameID(),
 		State:        "forming",
-		CharacterIDs: []identity.CharacterID{identity.NewCharacterID()},
+		CharacterIDs: []identity.PlayerCharacterID{identity.NewPlayerCharacterID()},
 	}
 	c, err := ReconstituteCampaign(snap)
 	if err != nil {
@@ -48,7 +48,7 @@ func TestReconstituteCampaign_ActiveState(t *testing.T) {
 		Name:         "Test Campaign",
 		GameID:       identity.NewGameID(),
 		State:        "active",
-		CharacterIDs: []identity.CharacterID{identity.NewCharacterID()},
+		CharacterIDs: []identity.PlayerCharacterID{identity.NewPlayerCharacterID()},
 	}
 	c, err := ReconstituteCampaign(snap)
 	if err != nil {
@@ -65,7 +65,7 @@ func TestReconstituteCampaign_IdleState(t *testing.T) {
 		Name:         "Test Campaign",
 		GameID:       identity.NewGameID(),
 		State:        "idle",
-		CharacterIDs: []identity.CharacterID{identity.NewCharacterID()},
+		CharacterIDs: []identity.PlayerCharacterID{identity.NewPlayerCharacterID()},
 	}
 	c, err := ReconstituteCampaign(snap)
 	if err != nil {
@@ -108,7 +108,7 @@ func TestReconstituteCampaign_UnknownState_ReturnsError(t *testing.T) {
 func TestReconstituteCampaign_RoundTrip(t *testing.T) {
 	// Create → AddCharacter → BeginFormation → snapshot → reconstitute → snapshot → compare
 	nc, _, _ := CreateCampaign(identity.NewCampaignID(), "Round Trip Campaign", identity.NewGameID(), event.SourceGrimoire)
-	charID := identity.NewCharacterID()
+	charID := identity.NewPlayerCharacterID()
 	nc, _, _ = nc.AddCharacter(charID, event.SourceGrimoire)
 	fc, _, _ := nc.BeginFormation(event.SourceGrimoire)
 
@@ -153,7 +153,7 @@ func TestReconstituteCampaign_WithCurrentLocationID(t *testing.T) {
 		Name:              "Campaign",
 		GameID:            identity.NewGameID(),
 		State:             "active",
-		CharacterIDs:      []identity.CharacterID{identity.NewCharacterID()},
+		CharacterIDs:      []identity.PlayerCharacterID{identity.NewPlayerCharacterID()},
 		CurrentLocationID: locID,
 	}
 	c, err := ReconstituteCampaign(snap)
@@ -166,13 +166,13 @@ func TestReconstituteCampaign_WithCurrentLocationID(t *testing.T) {
 }
 
 func TestReconstituteCampaign_ReconstitutedForming_CanTransition(t *testing.T) {
-	charID := identity.NewCharacterID()
+	charID := identity.NewPlayerCharacterID()
 	snap := CampaignSnapshot{
 		ID:           identity.NewCampaignID(),
 		Name:         "Forming Campaign",
 		GameID:       identity.NewGameID(),
 		State:        "forming",
-		CharacterIDs: []identity.CharacterID{charID},
+		CharacterIDs: []identity.PlayerCharacterID{charID},
 	}
 	c, _ := ReconstituteCampaign(snap)
 	fc := c.(FormingCampaign)

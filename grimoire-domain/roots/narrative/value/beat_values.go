@@ -4,8 +4,9 @@ package value
 type BeatScope string
 
 const (
-	BeatScopeMaster   BeatScope = "master"
-	BeatScopeCampaign BeatScope = "campaign"
+	BeatScopeMaster    BeatScope = "master"
+	BeatScopeCampaign  BeatScope = "campaign"
+	BeatScopeCharacter BeatScope = "character"
 )
 
 // BeatType categorizes how a beat relates to the narrative structure.
@@ -15,6 +16,8 @@ const (
 	BeatTypeRequired         BeatType = "required"
 	BeatTypeOptional         BeatType = "optional"
 	BeatTypeCampaignSpecific BeatType = "campaign-specific"
+	BeatTypeBackground       BeatType = "background"
+	BeatTypePersonalArc      BeatType = "personal-arc"
 )
 
 // BeatStatus tracks the lifecycle of a beat within the narrative.

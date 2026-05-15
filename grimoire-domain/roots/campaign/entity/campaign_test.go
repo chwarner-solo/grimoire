@@ -23,7 +23,7 @@ func mustCreateNewCampaign(t *testing.T) NewCampaign {
 func mustReachForming(t *testing.T) FormingCampaign {
 	t.Helper()
 	nc := mustCreateNewCampaign(t)
-	nc, _, err := nc.AddCharacter(identity.NewCharacterID(), event.SourceGrimoire)
+	nc, _, err := nc.AddCharacter(identity.NewPlayerCharacterID(), event.SourceGrimoire)
 	if err != nil {
 		t.Fatalf("mustReachForming add character: %v", err)
 	}
@@ -91,7 +91,7 @@ func TestCreateCampaign_ValidInputs_ReturnsNewCampaign(t *testing.T) {
 
 func TestNewCampaign_AddCharacter_Succeeds(t *testing.T) {
 	nc := mustCreateNewCampaign(t)
-	charID := identity.NewCharacterID()
+	charID := identity.NewPlayerCharacterID()
 	nc2, _, err := nc.AddCharacter(charID, event.SourceGrimoire)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -104,7 +104,7 @@ func TestNewCampaign_AddCharacter_Succeeds(t *testing.T) {
 
 func TestNewCampaign_AddCharacter_RejectsDuplicate(t *testing.T) {
 	nc := mustCreateNewCampaign(t)
-	charID := identity.NewCharacterID()
+	charID := identity.NewPlayerCharacterID()
 	nc, _, _ = nc.AddCharacter(charID, event.SourceGrimoire)
 	_, _, err := nc.AddCharacter(charID, event.SourceGrimoire)
 	if !errors.Is(err, ErrCharacterAlreadyAdded) {
@@ -123,7 +123,7 @@ func TestNewCampaign_BeginFormation_TransitionsToForming(t *testing.T) {
 
 func TestFormingCampaign_AddCharacter_Succeeds(t *testing.T) {
 	fc := mustReachForming(t)
-	charID := identity.NewCharacterID()
+	charID := identity.NewPlayerCharacterID()
 	fc2, _, err := fc.AddCharacter(charID, event.SourceGrimoire)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -283,7 +283,7 @@ func TestCreateCampaign_ProducesEntityCreatedEvent(t *testing.T) {
 
 func TestAddCharacter_ProducesEntityLinkedEvent(t *testing.T) {
 	nc := mustCreateNewCampaign(t)
-	charID := identity.NewCharacterID()
+	charID := identity.NewPlayerCharacterID()
 	_, events, err := nc.AddCharacter(charID, event.SourceFoundry)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -308,7 +308,7 @@ func TestAddCharacter_ProducesEntityLinkedEvent(t *testing.T) {
 
 func TestBeginFormation_ProducesEntityUpdatedEvent(t *testing.T) {
 	nc := mustCreateNewCampaign(t)
-	nc, _, _ = nc.AddCharacter(identity.NewCharacterID(), event.SourceGrimoire)
+	nc, _, _ = nc.AddCharacter(identity.NewPlayerCharacterID(), event.SourceGrimoire)
 	_, events, err := nc.BeginFormation(event.SourceGrimoire)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -397,7 +397,7 @@ func TestComplete_ProducesEntityUpdatedEvent(t *testing.T) {
 
 func TestAddCharacter_Error_ProducesNoEvents(t *testing.T) {
 	nc := mustCreateNewCampaign(t)
-	_, events, err := nc.AddCharacter(identity.CharacterID{}, event.SourceGrimoire)
+	_, events, err := nc.AddCharacter(identity.PlayerCharacterID{}, event.SourceGrimoire)
 	if err == nil {
 		t.Fatal("expected error")
 	}
@@ -409,7 +409,7 @@ func TestAddCharacter_Error_ProducesNoEvents(t *testing.T) {
 func TestCampaign_CommandEvents_RoundTrip_ThroughHandle(t *testing.T) {
 	campID := identity.NewCampaignID()
 	gameID := identity.NewGameID()
-	charID := identity.NewCharacterID()
+	charID := identity.NewPlayerCharacterID()
 	sessID := identity.NewSessionID()
 
 	// Build state via commands
