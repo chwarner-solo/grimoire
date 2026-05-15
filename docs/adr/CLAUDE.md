@@ -205,7 +205,7 @@ New → InProgress → Completed → Summarized → Idle
 New → Draft → Active → Idle → Archived
 ```
 - New → Draft: always allowed
-- Draft → Active: GUARD: name not empty, description not empty
+- Draft → Active: GUARD: name not empty (ADR-019-Amendment-001: description guard removed)
 - Active → Idle: GM marks dormant
 - Idle → Active: GM reactivates
 - Active → Archived: GM retires (terminal)

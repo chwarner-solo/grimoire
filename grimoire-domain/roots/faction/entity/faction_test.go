@@ -34,9 +34,6 @@ func draftFaction(t *testing.T) entity.DraftFaction {
 func activeFaction(t *testing.T) entity.ActiveFaction {
 	t.Helper()
 	d := draftFaction(t)
-	d, _, _ = d.AddMember(identity.NewFactionMembershipID(), event.SourceGrimoire)
-	sl, _ := value.NewStandingLevel("Neutral", 0, 0)
-	d, _, _ = d.AddStandingLevel(sl, event.SourceGrimoire)
 	a, _, err := d.Activate(event.SourceGrimoire)
 	if err != nil {
 		t.Fatalf("failed to activate: %v", err)
@@ -260,30 +257,8 @@ func TestDraftFaction_DeclareWar_RejectsIfAllied(t *testing.T) {
 	}
 }
 
-func TestDraftFaction_Activate_RequiresMember(t *testing.T) {
+func TestDraftFaction_Activate_Succeeds_WhenSparse(t *testing.T) {
 	d := draftFaction(t)
-	sl, _ := value.NewStandingLevel("Neutral", 0, 0)
-	d, _, _ = d.AddStandingLevel(sl, event.SourceGrimoire)
-	_, _, err := d.Activate(event.SourceGrimoire)
-	if !errors.Is(err, entity.ErrCannotActivateWithoutMembers) {
-		t.Fatalf("expected ErrCannotActivateWithoutMembers, got %v", err)
-	}
-}
-
-func TestDraftFaction_Activate_RequiresStandingLevel(t *testing.T) {
-	d := draftFaction(t)
-	d, _, _ = d.AddMember(identity.NewFactionMembershipID(), event.SourceGrimoire)
-	_, _, err := d.Activate(event.SourceGrimoire)
-	if !errors.Is(err, entity.ErrCannotActivateWithoutStandingLevels) {
-		t.Fatalf("expected ErrCannotActivateWithoutStandingLevels, got %v", err)
-	}
-}
-
-func TestDraftFaction_Activate_SucceedsWithBoth(t *testing.T) {
-	d := draftFaction(t)
-	d, _, _ = d.AddMember(identity.NewFactionMembershipID(), event.SourceGrimoire)
-	sl, _ := value.NewStandingLevel("Neutral", 0, 0)
-	d, _, _ = d.AddStandingLevel(sl, event.SourceGrimoire)
 	a, events, err := d.Activate(event.SourceGrimoire)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)

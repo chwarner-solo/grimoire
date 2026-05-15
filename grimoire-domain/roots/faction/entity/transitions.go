@@ -85,12 +85,6 @@ func (f *draftFaction) DeclareWar(enemyID identity.FactionID, source event.Sourc
 }
 
 func (f *draftFaction) Activate(source event.Source) (ActiveFaction, []event.Event, error) {
-	if len(f.memberIDs) == 0 {
-		return nil, nil, ErrCannotActivateWithoutMembers
-	}
-	if len(f.standingLevels) == 0 {
-		return nil, nil, ErrCannotActivateWithoutStandingLevels
-	}
 	evt := event.EntityUpdated{
 		EntityID: f.id.String(),
 		Field:    "status",

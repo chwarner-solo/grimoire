@@ -34,7 +34,6 @@ func draftLocation(t *testing.T) entity.DraftLocation {
 func activeLocation(t *testing.T) entity.ActiveLocation {
 	t.Helper()
 	d := draftLocation(t)
-	d, _, _ = d.AddScene(identity.NewSceneID(), event.SourceGrimoire)
 	a, _, err := d.Activate(event.SourceGrimoire)
 	if err != nil {
 		t.Fatalf("failed to activate: %v", err)
@@ -220,17 +219,8 @@ func TestDraftLocation_AddChild_RejectsDuplicate(t *testing.T) {
 	}
 }
 
-func TestDraftLocation_Activate_RequiresScene(t *testing.T) {
+func TestDraftLocation_Activate_Succeeds_WhenSparse(t *testing.T) {
 	d := draftLocation(t)
-	_, _, err := d.Activate(event.SourceGrimoire)
-	if !errors.Is(err, entity.ErrCannotActivateWithoutScenes) {
-		t.Fatalf("expected ErrCannotActivateWithoutScenes, got %v", err)
-	}
-}
-
-func TestDraftLocation_Activate_SucceedsWithScene(t *testing.T) {
-	d := draftLocation(t)
-	d, _, _ = d.AddScene(identity.NewSceneID(), event.SourceGrimoire)
 	a, events, err := d.Activate(event.SourceGrimoire)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)

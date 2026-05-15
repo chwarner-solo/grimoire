@@ -14,8 +14,6 @@ var (
 	ErrMembershipIDRequired               = errors.New("faction: membership id is required")
 	ErrRankRequired                       = errors.New("faction: rank is required")
 	ErrCharacterIDRequired                = errors.New("faction: character id is required")
-	ErrCannotActivateWithoutMembers       = errors.New("faction: cannot activate without members")
-	ErrCannotActivateWithoutStandingLevels = errors.New("faction: cannot activate without standing levels")
 	ErrMemberAlreadyExists                = errors.New("faction: member already exists")
 	ErrAllianceAlreadyExists              = errors.New("faction: alliance already exists")
 	ErrWarAlreadyExists                   = errors.New("faction: war already exists")

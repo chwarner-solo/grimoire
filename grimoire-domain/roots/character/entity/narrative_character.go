@@ -192,9 +192,6 @@ func (n *draftNPC) Activate(source event.Source) (ActiveNPC, []event.Event, erro
 	if strings.TrimSpace(n.name) == "" {
 		return nil, nil, ErrNPCNameRequired
 	}
-	if strings.TrimSpace(n.description) == "" {
-		return nil, nil, ErrNPCDescriptionRequired
-	}
 	evt := event.EntityUpdated{
 		EntityID: n.id.String(),
 		Field:    "status",

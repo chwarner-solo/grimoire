@@ -14,7 +14,6 @@ var (
 	ErrLocationTypeRequired      = errors.New("location: location type is required")
 	ErrSceneIDRequired           = errors.New("location: scene id is required")
 	ErrSceneNameRequired         = errors.New("location: scene name is required")
-	ErrCannotActivateWithoutScenes = errors.New("location: cannot activate without scenes")
 	ErrSceneAlreadyExists        = errors.New("location: scene already exists")
 	ErrChildAlreadyExists        = errors.New("location: child already exists")
 	ErrCannotConnectToSelf       = errors.New("location: cannot connect to self")

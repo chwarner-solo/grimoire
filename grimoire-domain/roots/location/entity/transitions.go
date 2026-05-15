@@ -55,9 +55,6 @@ func (l *draftLocation) AddChild(childID identity.LocationID, source event.Sourc
 }
 
 func (l *draftLocation) Activate(source event.Source) (ActiveLocation, []event.Event, error) {
-	if len(l.sceneIDs) == 0 {
-		return nil, nil, ErrCannotActivateWithoutScenes
-	}
 	evt := event.EntityUpdated{
 		EntityID: l.id.String(),
 		Field:    "status",

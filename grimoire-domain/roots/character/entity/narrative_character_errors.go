@@ -6,7 +6,6 @@ var (
 	ErrNPCIDRequired          = errors.New("npc: id is required")
 	ErrNPCNameRequired        = errors.New("npc: name is required")
 	ErrNPCGameIDRequired      = errors.New("npc: game id is required")
-	ErrNPCDescriptionRequired = errors.New("npc: description is required for activation")
 	ErrLocationIDRequired     = errors.New("npc: location id is required")
 	ErrMacGuffinIDRequired    = errors.New("npc: macguffin id is required")
 	ErrSessionIDRequired      = errors.New("npc: session id is required")

@@ -32,7 +32,6 @@ func mustDraftNPC(t *testing.T) DraftNPC {
 func mustActiveNPC(t *testing.T) ActiveNPC {
 	t.Helper()
 	d := mustDraftNPC(t)
-	d, _, _ = d.UpdateContent("Velleth", "A shadow mage", "A mysterious figure", event.SourceGrimoire)
 	a, _, err := d.Activate(event.SourceGrimoire)
 	if err != nil {
 		t.Fatalf("mustActiveNPC: %v", err)
@@ -149,18 +148,23 @@ func TestDraftNPC_AssignToLocation_RequiresLocationID(t *testing.T) {
 	}
 }
 
-func TestDraftNPC_Activate_RequiresDescription(t *testing.T) {
+func TestDraftNPC_Activate_Succeeds_WhenSparse(t *testing.T) {
 	d := mustDraftNPC(t)
-	_, _, err := d.Activate(event.SourceGrimoire)
-	if !errors.Is(err, ErrNPCDescriptionRequired) {
-		t.Fatalf("expected ErrNPCDescriptionRequired, got: %v", err)
+	a, events, err := d.Activate(event.SourceGrimoire)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
 	}
-}
-
-func TestDraftNPC_Activate_Succeeds_WithContent(t *testing.T) {
-	a := mustActiveNPC(t)
 	if a.Snapshot().State != "active" {
-		t.Fatal("expected active state")
+		t.Fatalf("expected state 'active', got %q", a.Snapshot().State)
+	}
+	if a.NPCName() != "Velleth" {
+		t.Fatalf("expected name 'Velleth', got %q", a.NPCName())
+	}
+	if a.Snapshot().Description != "" {
+		t.Fatalf("expected empty description, got %q", a.Snapshot().Description)
+	}
+	if len(events) != 1 {
+		t.Fatalf("expected 1 event, got %d", len(events))
 	}
 }
 
