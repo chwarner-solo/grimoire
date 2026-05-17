@@ -4,6 +4,7 @@ import "errors"
 
 var (
 	ErrGameIDRequired            = errors.New("game: id is required")
+	ErrGMIDRequired              = errors.New("game: gm id is required")
 	ErrGameNameRequired          = errors.New("game: name is required")
 	ErrMasterNarrativeIDRequired = errors.New("game: master narrative id is required")
 	ErrCampaignIDRequired        = errors.New("game: campaign id is required")

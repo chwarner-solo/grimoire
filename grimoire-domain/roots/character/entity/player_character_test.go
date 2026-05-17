@@ -12,7 +12,7 @@ import (
 
 func mustCreatePlayerCharacter(t *testing.T) *PlayerCharacter {
 	t.Helper()
-	pc, _, err := CreatePlayerCharacter(identity.NewPlayerCharacterID(), identity.NewGameID(), "Elara", "player1", event.SourceGrimoire)
+	pc, _, err := CreatePlayerCharacter(identity.NewPlayerCharacterID(), identity.NewGameID(), "Elara", "", event.SourceGrimoire)
 	if err != nil {
 		t.Fatalf("mustCreatePlayerCharacter: %v", err)
 	}
@@ -24,7 +24,7 @@ func mustCreatePlayerCharacter(t *testing.T) *PlayerCharacter {
 func TestCreatePlayerCharacter_ValidInputs(t *testing.T) {
 	id := identity.NewPlayerCharacterID()
 	gameID := identity.NewGameID()
-	pc, events, err := CreatePlayerCharacter(id, gameID, "Elara", "player1", event.SourceGrimoire)
+	pc, events, err := CreatePlayerCharacter(id, gameID, "Elara", "player-uid-001", event.SourceGrimoire)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -44,30 +44,33 @@ func TestCreatePlayerCharacter_ValidInputs(t *testing.T) {
 }
 
 func TestCreatePlayerCharacter_RequiresID(t *testing.T) {
-	_, _, err := CreatePlayerCharacter(identity.PlayerCharacterID{}, identity.NewGameID(), "Name", "player1", event.SourceGrimoire)
+	_, _, err := CreatePlayerCharacter(identity.PlayerCharacterID{}, identity.NewGameID(), "Name", "", event.SourceGrimoire)
 	if !errors.Is(err, ErrPlayerCharacterIDRequired) {
 		t.Fatalf("expected ErrPlayerCharacterIDRequired, got: %v", err)
 	}
 }
 
 func TestCreatePlayerCharacter_RequiresGameID(t *testing.T) {
-	_, _, err := CreatePlayerCharacter(identity.NewPlayerCharacterID(), identity.GameID{}, "Name", "player1", event.SourceGrimoire)
+	_, _, err := CreatePlayerCharacter(identity.NewPlayerCharacterID(), identity.GameID{}, "Name", "", event.SourceGrimoire)
 	if !errors.Is(err, ErrPCGameIDRequired) {
 		t.Fatalf("expected ErrPCGameIDRequired, got: %v", err)
 	}
 }
 
 func TestCreatePlayerCharacter_RequiresName(t *testing.T) {
-	_, _, err := CreatePlayerCharacter(identity.NewPlayerCharacterID(), identity.NewGameID(), "", "player1", event.SourceGrimoire)
+	_, _, err := CreatePlayerCharacter(identity.NewPlayerCharacterID(), identity.NewGameID(), "", "", event.SourceGrimoire)
 	if !errors.Is(err, ErrCharacterNameRequired) {
 		t.Fatalf("expected ErrCharacterNameRequired, got: %v", err)
 	}
 }
 
-func TestCreatePlayerCharacter_RequiresOwnerPlayerID(t *testing.T) {
-	_, _, err := CreatePlayerCharacter(identity.NewPlayerCharacterID(), identity.NewGameID(), "Name", "", event.SourceGrimoire)
-	if !errors.Is(err, ErrOwnerPlayerIDRequired) {
-		t.Fatalf("expected ErrOwnerPlayerIDRequired, got: %v", err)
+func TestCreatePlayerCharacter_Succeeds_WithEmptyOwnerPlayerID(t *testing.T) {
+	pc, _, err := CreatePlayerCharacter(identity.NewPlayerCharacterID(), identity.NewGameID(), "Elara", "", event.SourceGrimoire)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if pc.OwnerPlayerID() != "" {
+		t.Fatalf("expected empty ownerPlayerID, got %q", pc.OwnerPlayerID())
 	}
 }
 

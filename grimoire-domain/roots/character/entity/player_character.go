@@ -49,9 +49,6 @@ func CreatePlayerCharacter(
 	if strings.TrimSpace(name) == "" {
 		return nil, nil, ErrCharacterNameRequired
 	}
-	if strings.TrimSpace(ownerPlayerID) == "" {
-		return nil, nil, ErrOwnerPlayerIDRequired
-	}
 	evt := event.EntityCreated{
 		EntityID:   id.String(),
 		EntityType: "player_character",

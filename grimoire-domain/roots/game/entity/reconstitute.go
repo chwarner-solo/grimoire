@@ -9,6 +9,7 @@ import (
 // GameSnapshot is the DTO used for persistence and reconstitution.
 type GameSnapshot struct {
 	ID                  identity.GameID
+	GMID                string
 	Name                string
 	MasterNarrativeID   identity.MasterNarrativeID
 	State               string
@@ -21,6 +22,7 @@ type GameSnapshot struct {
 func ReconstituteGame(snap GameSnapshot) (Game, error) {
 	core := gameCore{
 		id:                  snap.ID,
+		gmID:                snap.GMID,
 		name:                snap.Name,
 		masterNarrativeID:   snap.MasterNarrativeID,
 		campaignIDs:         snap.CampaignIDs,

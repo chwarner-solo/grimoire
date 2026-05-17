@@ -12,7 +12,7 @@ import (
 
 func mustCreateNewGame(t *testing.T) NewGame {
 	t.Helper()
-	g, _, err := CreateGame(identity.NewGameID(), "Ashes & Chains", event.SourceGrimoire)
+	g, _, err := CreateGame(identity.NewGameID(), "gm-uid-test", "Ashes & Chains", event.SourceGrimoire)
 	if err != nil {
 		t.Fatalf("mustCreateNewGame: %v", err)
 	}
@@ -63,21 +63,35 @@ func mustReachIdle(t *testing.T) IdleGame {
 // --- Constructor tests ---
 
 func TestCreateGame_RequiresNonZeroID(t *testing.T) {
-	_, _, err := CreateGame(identity.GameID{}, "Ashes & Chains", event.SourceGrimoire)
+	_, _, err := CreateGame(identity.GameID{}, "gm-uid", "Ashes & Chains", event.SourceGrimoire)
 	if !errors.Is(err, ErrGameIDRequired) {
 		t.Fatalf("expected ErrGameIDRequired, got: %v", err)
 	}
 }
 
+func TestCreateGame_RequiresNonEmptyGMID(t *testing.T) {
+	_, _, err := CreateGame(identity.NewGameID(), "", "Ashes & Chains", event.SourceGrimoire)
+	if !errors.Is(err, ErrGMIDRequired) {
+		t.Fatalf("expected ErrGMIDRequired, got: %v", err)
+	}
+}
+
+func TestCreateGame_RequiresNonWhitespaceGMID(t *testing.T) {
+	_, _, err := CreateGame(identity.NewGameID(), "   ", "Ashes & Chains", event.SourceGrimoire)
+	if !errors.Is(err, ErrGMIDRequired) {
+		t.Fatalf("expected ErrGMIDRequired, got: %v", err)
+	}
+}
+
 func TestCreateGame_RequiresNonEmptyName(t *testing.T) {
-	_, _, err := CreateGame(identity.NewGameID(), "", event.SourceGrimoire)
+	_, _, err := CreateGame(identity.NewGameID(), "gm-uid", "", event.SourceGrimoire)
 	if !errors.Is(err, ErrGameNameRequired) {
 		t.Fatalf("expected ErrGameNameRequired, got: %v", err)
 	}
 }
 
 func TestCreateGame_RequiresNonWhitespaceName(t *testing.T) {
-	_, _, err := CreateGame(identity.NewGameID(), "   ", event.SourceGrimoire)
+	_, _, err := CreateGame(identity.NewGameID(), "gm-uid", "   ", event.SourceGrimoire)
 	if !errors.Is(err, ErrGameNameRequired) {
 		t.Fatalf("expected ErrGameNameRequired, got: %v", err)
 	}
@@ -90,6 +104,9 @@ func TestCreateGame_ValidInputs_ReturnsNewGame(t *testing.T) {
 	}
 	if g.GameID().IsZero() {
 		t.Fatal("expected non-zero GameID")
+	}
+	if g.GMID() != "gm-uid-test" {
+		t.Fatalf("expected GMID 'gm-uid-test', got %q", g.GMID())
 	}
 }
 
@@ -262,7 +279,7 @@ func TestArchivedGame_PreservesIdentity(t *testing.T) {
 
 func TestCreateGame_ProducesEntityCreatedEvent(t *testing.T) {
 	id := identity.NewGameID()
-	_, events, err := CreateGame(id, "Test Game", event.SourceObsidian)
+	_, events, err := CreateGame(id, "gm-uid", "Test Game", event.SourceObsidian)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

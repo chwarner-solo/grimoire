@@ -19,9 +19,10 @@ type GameRepository interface {
 
 // CreateGameRequest holds the input for creating a new game.
 type CreateGameRequest struct {
-	ID     identity.GameID
-	Name   string
-	Source event.Source
+	CallerID string          // verified Firebase UID — set by API layer
+	ID       identity.GameID
+	Name     string
+	Source   event.Source
 }
 
 // CreateGameResult holds the output of a successful game creation.
@@ -46,7 +47,7 @@ func NewCreateGameInteractor(repo GameRepository, bus event.EventBus) *CreateGam
 
 // Execute validates input, creates the Game aggregate, persists it, and dispatches events.
 func (i *CreateGameInteractor) Execute(ctx context.Context, req CreateGameRequest) (CreateGameResult, error) {
-	game, events, err := entity.CreateGame(req.ID, req.Name, req.Source)
+	game, events, err := entity.CreateGame(req.ID, req.CallerID, req.Name, req.Source)
 	if err != nil {
 		return CreateGameResult{}, err
 	}

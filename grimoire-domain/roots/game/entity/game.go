@@ -10,6 +10,7 @@ import (
 // gameCore holds the shared state for all Game states.
 type gameCore struct {
 	id                  identity.GameID
+	gmID                string
 	name                string
 	masterNarrativeID   identity.MasterNarrativeID
 	campaignIDs         []identity.CampaignID
@@ -17,6 +18,7 @@ type gameCore struct {
 }
 
 func (c *gameCore) GameID() identity.GameID                       { return c.id }
+func (c *gameCore) GMID() string                                  { return c.gmID }
 func (c *gameCore) GameName() string                              { return c.name }
 func (c *gameCore) MasterNarrativeID() identity.MasterNarrativeID { return c.masterNarrativeID }
 func (c *gameCore) isGame()                                       {}
@@ -35,6 +37,7 @@ func (c *gameCore) snapshot(state string) GameSnapshot {
 	copy(ids, c.campaignIDs)
 	return GameSnapshot{
 		ID:                  c.id,
+		GMID:                c.gmID,
 		Name:                c.name,
 		MasterNarrativeID:   c.masterNarrativeID,
 		State:               state,
@@ -44,9 +47,13 @@ func (c *gameCore) snapshot(state string) GameSnapshot {
 }
 
 // CreateGame constructs a new Game aggregate in the New state.
-func CreateGame(id identity.GameID, name string, source event.Source) (NewGame, []event.Event, error) {
+// gmID is the Firebase UID of the GM creating the game.
+func CreateGame(id identity.GameID, gmID string, name string, source event.Source) (NewGame, []event.Event, error) {
 	if id.IsZero() {
 		return nil, nil, ErrGameIDRequired
+	}
+	if strings.TrimSpace(gmID) == "" {
+		return nil, nil, ErrGMIDRequired
 	}
 	if strings.TrimSpace(name) == "" {
 		return nil, nil, ErrGameNameRequired
@@ -59,6 +66,7 @@ func CreateGame(id identity.GameID, name string, source event.Source) (NewGame, 
 	}
 	return &newGame{gameCore: gameCore{
 		id:   id,
+		gmID: gmID,
 		name: name,
 	}}, []event.Event{evt}, nil
 }

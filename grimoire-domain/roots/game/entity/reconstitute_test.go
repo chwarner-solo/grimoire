@@ -11,6 +11,7 @@ import (
 func TestReconstituteGame_NewState(t *testing.T) {
 	snap := GameSnapshot{
 		ID:    identity.NewGameID(),
+		GMID:  "gm-uid-001",
 		Name:  "Test Game",
 		State: "new",
 	}
@@ -26,6 +27,7 @@ func TestReconstituteGame_NewState(t *testing.T) {
 func TestReconstituteGame_DraftState(t *testing.T) {
 	snap := GameSnapshot{
 		ID:                identity.NewGameID(),
+		GMID:              "gm-uid-001",
 		Name:              "Test Game",
 		MasterNarrativeID: identity.NewMasterNarrativeID(),
 		State:             "draft",
@@ -43,6 +45,7 @@ func TestReconstituteGame_ActiveState(t *testing.T) {
 	cid := identity.NewCampaignID()
 	snap := GameSnapshot{
 		ID:                  identity.NewGameID(),
+		GMID:                "gm-uid-001",
 		Name:                "Test Game",
 		MasterNarrativeID:   identity.NewMasterNarrativeID(),
 		State:               "active",
@@ -61,6 +64,7 @@ func TestReconstituteGame_ActiveState(t *testing.T) {
 func TestReconstituteGame_IdleState(t *testing.T) {
 	snap := GameSnapshot{
 		ID:                identity.NewGameID(),
+		GMID:              "gm-uid-001",
 		Name:              "Test Game",
 		MasterNarrativeID: identity.NewMasterNarrativeID(),
 		State:             "idle",
@@ -78,6 +82,7 @@ func TestReconstituteGame_IdleState(t *testing.T) {
 func TestReconstituteGame_ArchivedState(t *testing.T) {
 	snap := GameSnapshot{
 		ID:                identity.NewGameID(),
+		GMID:              "gm-uid-001",
 		Name:              "Test Game",
 		MasterNarrativeID: identity.NewMasterNarrativeID(),
 		State:             "archived",
@@ -94,6 +99,7 @@ func TestReconstituteGame_ArchivedState(t *testing.T) {
 func TestReconstituteGame_UnknownState_ReturnsError(t *testing.T) {
 	snap := GameSnapshot{
 		ID:    identity.NewGameID(),
+		GMID:  "gm-uid-001",
 		Name:  "Test Game",
 		State: "bogus",
 	}
@@ -105,7 +111,7 @@ func TestReconstituteGame_UnknownState_ReturnsError(t *testing.T) {
 
 func TestReconstituteGame_RoundTrip(t *testing.T) {
 	// Create → Draft → snapshot → reconstitute → snapshot → compare
-	ng, _, _ := CreateGame(identity.NewGameID(), "Round Trip Game", event.SourceGrimoire)
+	ng, _, _ := CreateGame(identity.NewGameID(), "gm-uid-001", "Round Trip Game", event.SourceGrimoire)
 	mnID := identity.NewMasterNarrativeID()
 	dg, _ := ng.OnNarrativeCreated(mnID)
 	cid := identity.NewCampaignID()
@@ -122,6 +128,9 @@ func TestReconstituteGame_RoundTrip(t *testing.T) {
 
 	if snap1.ID.String() != snap2.ID.String() {
 		t.Fatal("ID mismatch after round trip")
+	}
+	if snap1.GMID != snap2.GMID {
+		t.Fatal("GMID mismatch after round trip")
 	}
 	if snap1.Name != snap2.Name {
 		t.Fatal("Name mismatch after round trip")
@@ -147,6 +156,7 @@ func TestReconstituteGame_ActiveWithMultipleCampaigns_StaysActiveAfterOneIdle(t 
 	c2 := identity.NewCampaignID()
 	snap := GameSnapshot{
 		ID:                  identity.NewGameID(),
+		GMID:                "gm-uid-001",
 		Name:                "Multi Campaign",
 		MasterNarrativeID:   identity.NewMasterNarrativeID(),
 		State:               "active",
@@ -171,6 +181,7 @@ func TestReconstituteGame_ReconstitutedDraft_CanTransition(t *testing.T) {
 	cid := identity.NewCampaignID()
 	snap := GameSnapshot{
 		ID:                identity.NewGameID(),
+		GMID:              "gm-uid-001",
 		Name:              "Draft Game",
 		MasterNarrativeID: identity.NewMasterNarrativeID(),
 		State:             "draft",

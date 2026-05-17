@@ -116,6 +116,7 @@ func (c *gameCore) copyCore() gameCore {
 	copy(ids, c.campaignIDs)
 	return gameCore{
 		id:                  c.id,
+		gmID:                c.gmID,
 		name:                c.name,
 		masterNarrativeID:   c.masterNarrativeID,
 		campaignIDs:         ids,
@@ -127,7 +128,8 @@ func (c *gameCore) copyCore() gameCore {
 
 // ReplayGame rebuilds a Game aggregate from a sequence of events.
 // The first event must be an EntityCreated for a game.
-func ReplayGame(events []event.Event) (Game, error) {
+// gmID must be provided by the caller — it is not carried in events (ADR-020).
+func ReplayGame(gmID string, events []event.Event) (Game, error) {
 	if len(events) == 0 {
 		return nil, errors.New("game: no events to replay")
 	}
@@ -142,7 +144,7 @@ func ReplayGame(events []event.Event) (Game, error) {
 		return nil, fmt.Errorf("game replay: %w", err)
 	}
 
-	g, _, err := CreateGame(gameID, first.Name, event.SourceGrimoire)
+	g, _, err := CreateGame(gameID, gmID, first.Name, event.SourceGrimoire)
 	if err != nil {
 		return nil, fmt.Errorf("game replay: %w", err)
 	}

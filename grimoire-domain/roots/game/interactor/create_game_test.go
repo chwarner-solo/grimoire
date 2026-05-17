@@ -52,9 +52,10 @@ func TestCreateGame_SavesGameToRepository(t *testing.T) {
 
 	gameID := identity.NewGameID()
 	req := CreateGameRequest{
-		ID:     gameID,
-		Name:   "Ashes & Chains",
-		Source: event.SourceGrimoire,
+		CallerID: "test-gm-uid-001",
+		ID:       gameID,
+		Name:     "Ashes & Chains",
+		Source:   event.SourceGrimoire,
 	}
 
 	_, err := interactor.Execute(context.Background(), req)
@@ -74,9 +75,10 @@ func TestCreateGame_DispatchesEntityCreatedEvent(t *testing.T) {
 
 	gameID := identity.NewGameID()
 	req := CreateGameRequest{
-		ID:     gameID,
-		Name:   "Ashes & Chains",
-		Source: event.SourceObsidian,
+		CallerID: "test-gm-uid-001",
+		ID:       gameID,
+		Name:     "Ashes & Chains",
+		Source:   event.SourceObsidian,
 	}
 
 	_, err := interactor.Execute(context.Background(), req)
@@ -121,9 +123,10 @@ func TestCreateGame_ReturnsGameAndEvents(t *testing.T) {
 
 	gameID := identity.NewGameID()
 	req := CreateGameRequest{
-		ID:     gameID,
-		Name:   "Ashes & Chains",
-		Source: event.SourceGrimoire,
+		CallerID: "test-gm-uid-001",
+		ID:       gameID,
+		Name:     "Ashes & Chains",
+		Source:   event.SourceGrimoire,
 	}
 
 	result, err := interactor.Execute(context.Background(), req)
@@ -151,9 +154,10 @@ func TestCreateGame_InvalidName_ReturnsError(t *testing.T) {
 	interactor := NewCreateGameInteractor(repo, bus)
 
 	req := CreateGameRequest{
-		ID:     identity.NewGameID(),
-		Name:   "",
-		Source: event.SourceGrimoire,
+		CallerID: "test-gm-uid-001",
+		ID:       identity.NewGameID(),
+		Name:     "",
+		Source:   event.SourceGrimoire,
 	}
 
 	_, err := interactor.Execute(context.Background(), req)
@@ -176,9 +180,10 @@ func TestCreateGame_RepositoryFailure_ReturnsError(t *testing.T) {
 	interactor := NewCreateGameInteractor(repo, bus)
 
 	req := CreateGameRequest{
-		ID:     identity.NewGameID(),
-		Name:   "Ashes & Chains",
-		Source: event.SourceGrimoire,
+		CallerID: "test-gm-uid-001",
+		ID:       identity.NewGameID(),
+		Name:     "Ashes & Chains",
+		Source:   event.SourceGrimoire,
 	}
 
 	_, err := interactor.Execute(context.Background(), req)
@@ -200,9 +205,10 @@ func TestCreateGame_DispatchFailure_ReturnsError(t *testing.T) {
 	interactor := NewCreateGameInteractor(repo, bus)
 
 	req := CreateGameRequest{
-		ID:     identity.NewGameID(),
-		Name:   "Ashes & Chains",
-		Source: event.SourceGrimoire,
+		CallerID: "test-gm-uid-001",
+		ID:       identity.NewGameID(),
+		Name:     "Ashes & Chains",
+		Source:   event.SourceGrimoire,
 	}
 
 	_, err := interactor.Execute(context.Background(), req)
@@ -211,5 +217,46 @@ func TestCreateGame_DispatchFailure_ReturnsError(t *testing.T) {
 	}
 	if !errors.Is(err, ErrEventDispatchFailed) {
 		t.Fatalf("expected ErrEventDispatchFailed, got: %v", err)
+	}
+}
+
+func TestCreateGame_SetsGMIDFromCallerID(t *testing.T) {
+	repo := &stubGameRepository{}
+	bus := &spyEventBus{}
+	interactor := NewCreateGameInteractor(repo, bus)
+
+	result, err := interactor.Execute(context.Background(), CreateGameRequest{
+		CallerID: "test-gm-uid-001",
+		ID:       identity.NewGameID(),
+		Name:     "Ashes & Chains",
+		Source:   event.SourceGrimoire,
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if result.Game.GMID() != "test-gm-uid-001" {
+		t.Fatalf("expected GMID 'test-gm-uid-001', got %q", result.Game.GMID())
+	}
+}
+
+func TestCreateGame_EmptyCallerID_ReturnsError(t *testing.T) {
+	repo := &stubGameRepository{}
+	bus := &spyEventBus{}
+	interactor := NewCreateGameInteractor(repo, bus)
+
+	_, err := interactor.Execute(context.Background(), CreateGameRequest{
+		CallerID: "",
+		ID:       identity.NewGameID(),
+		Name:     "Ashes & Chains",
+		Source:   event.SourceGrimoire,
+	})
+	if err == nil {
+		t.Fatal("expected error for empty CallerID")
+	}
+	if !errors.Is(err, entity.ErrGMIDRequired) {
+		t.Fatalf("expected ErrGMIDRequired, got: %v", err)
+	}
+	if repo.savedGame != nil {
+		t.Fatal("expected no save when CallerID is empty")
 	}
 }

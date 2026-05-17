@@ -15,7 +15,7 @@ import (
 func newGameForHandle(t *testing.T) entity.Game {
 	t.Helper()
 	id := identity.NewGameID()
-	g, _, err := entity.CreateGame(id, "Test Game", event.SourceGrimoire)
+	g, _, err := entity.CreateGame(id, "gm-uid-test", "Test Game", event.SourceGrimoire)
 	if err != nil {
 		t.Fatalf("failed to create game: %v", err)
 	}
@@ -299,7 +299,7 @@ func TestReplayGame_FullLifecycle(t *testing.T) {
 		event.EntityUpdated{EntityID: gameID.String(), Field: "status", OldValue: "idle", NewValue: "archived", Source: event.SourceGrimoire},
 	}
 
-	result, err := entity.ReplayGame(events)
+	result, err := entity.ReplayGame("gm-uid-replay", events)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -309,10 +309,13 @@ func TestReplayGame_FullLifecycle(t *testing.T) {
 	if result.GameName() != "My Game" {
 		t.Fatalf("expected name 'My Game', got '%s'", result.GameName())
 	}
+	if result.GMID() != "gm-uid-replay" {
+		t.Fatalf("expected GMID 'gm-uid-replay', got %q", result.GMID())
+	}
 }
 
 func TestReplayGame_EmptyEvents_ReturnsError(t *testing.T) {
-	_, err := entity.ReplayGame(nil)
+	_, err := entity.ReplayGame("gm-uid-test", nil)
 	if err == nil {
 		t.Fatal("expected error for empty events")
 	}

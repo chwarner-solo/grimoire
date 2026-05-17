@@ -10,6 +10,7 @@ import (
 type Game interface {
 	isGame()
 	GameID() identity.GameID
+	GMID() string
 	GameName() string
 	MasterNarrativeID() identity.MasterNarrativeID
 	Snapshot() GameSnapshot
