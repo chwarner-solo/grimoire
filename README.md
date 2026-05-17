@@ -70,4 +70,18 @@ Design decisions are documented as ADRs in [`grimoire-domain/docs/adr/`](docs/ad
 | [ADR-015](docs/adr/ADR-015_Narrative-DAG.md) | ~~Narrative as DAG~~ (superseded by ADR-016) |
 | [ADR-016](docs/adr/ADR-016_Narrative-Aggregate-Architecture.md) | Narrative Aggregate Architecture — Authoritative Record |
 | [ADR-017](docs/adr/ADR-017_Faction-Aggregate.md) | Faction Aggregate Architecture |
+| [ADR-017-Amendment-001](docs/adr/ADR-017_Amendment-001_Sparse-Not-Errored.md) | Sparse Not Errored — Faction |
 | [ADR-018](docs/adr/ADR-018_Location-Aggregate.md) | Location Aggregate Architecture |
+| [ADR-018-Amendment-001](docs/adr/ADR-018_Amendment-001_Sparse-Not-Errored.md) | Sparse Not Errored — Location |
+| [ADR-019](docs/adr/ADR-019_Character-aggregate.md) | Character Aggregate Architecture |
+| [ADR-019-Amendment-001](docs/adr/ADR-019_Amendment-001_Sparse-Not-Errored.md) | Sparse Not Errored — NPC |
+| [ADR-019-Amendment-002](docs/adr/ADR-019_Amendment-002_POwnerPlayerIDOptional.md) | ownerPlayerID Optional on PlayerCharacter |
+| [ADR-020](docs/adr/ADR-020_Ownership_Authentication_Authorization.md) | Ownership, Authentication, and Authorization |
+| [ADR-021](docs/adr/ADR-021_Game-Interactors.md) | Game Interactors |
+| [ADR-022](docs/adr/ADR-022_CAmpaign-interactors.md) | Campaign Interactors |
+| [ADR-023](docs/adr/ADR-023_Narrative-Interactors.md) | Narrative Interactors |
+| [ADR-024](docs/adr/ADR-024_Faction-Interactors.md) | Faction Interactors |
+| [ADR-025](docs/adr/ADR-015_Location-Interactors.md) | Location Interactors |
+| [ADR-026](docs/adr/ADR-026_Character-Interactors.md) | Character Interactors |
+| [ADR-027](docs/adr/ADR-027_RevealEntity-Interactor.md) | RevealEntity Interactor |
+| [ADR-028](docs/adr/ADR-028_Graphql-Mutation-Schema.md) | GraphQL Mutation Schema |

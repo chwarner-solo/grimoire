@@ -318,7 +318,20 @@ type EventEnvelope struct {
 | ADR-015 | ~~Narrative as DAG~~ (superseded by ADR-016) |
 | ADR-016 | Narrative Aggregate Architecture — Authoritative Record |
 | ADR-017 | Faction Aggregate Architecture |
+| ADR-017-Amendment-001 | Sparse Not Errored — Faction |
 | ADR-018 | Location Aggregate Architecture |
+| ADR-018-Amendment-001 | Sparse Not Errored — Location |
 | ADR-019 | Character Aggregate Architecture |
+| ADR-019-Amendment-001 | Sparse Not Errored — NPC |
+| ADR-019-Amendment-002 | ownerPlayerID Optional on PlayerCharacter |
+| ADR-020 | Ownership, Authentication, and Authorization |
+| ADR-021 | Game Interactors |
+| ADR-022 | Campaign Interactors |
+| ADR-023 | Narrative Interactors |
+| ADR-024 | Faction Interactors |
+| ADR-025 | Location Interactors |
+| ADR-026 | Character Interactors |
+| ADR-027 | RevealEntity Interactor |
+| ADR-028 | GraphQL Mutation Schema |
 
 See `docs/adr/` for full records.
