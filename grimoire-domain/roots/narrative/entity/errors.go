@@ -21,6 +21,9 @@ var (
 	ErrInvalidBeatTypeForCharacterScope = errors.New("narrative: beat type must be background or personal-arc for character scope")
 )
 
+// ErrBeatAlreadyMasterScope indicates a Beat is already at master scope.
+var ErrBeatAlreadyMasterScope = errors.New("narrative: beat is already at master scope")
+
 // ErrCycleDetected indicates that adding a prerequisite would create a cycle in the beat DAG.
 type ErrCycleDetected struct {
 	BeatID identity.BeatID

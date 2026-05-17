@@ -148,6 +148,29 @@ func (f *activeFaction) DeclareWar(enemyID identity.FactionID, source event.Sour
 	return f, []event.Event{evt}, nil
 }
 
+func (f *activeFaction) AddStandingLevel(level value.StandingLevel, source event.Source) (ActiveFaction, []event.Event, error) {
+	f.standingLevels = append(f.standingLevels, level)
+	evt := event.EntityUpdated{
+		EntityID: f.id.String(),
+		Field:    "standing_levels",
+		OldValue: "",
+		NewValue: level.Name(),
+		Source:   source,
+	}
+	return f, []event.Event{evt}, nil
+}
+
+func (f *activeFaction) Reveal(to []string, sessionID identity.SessionID, source event.Source) (ActiveFaction, []event.Event, error) {
+	f.playerVisible = true
+	evt := event.EntityRevealed{
+		EntityID:   f.id.String(),
+		RevealedTo: to,
+		SessionID:  sessionID.String(),
+		Source:     source,
+	}
+	return f, []event.Event{evt}, nil
+}
+
 func (f *activeFaction) MarkDormant(source event.Source) (IdleFaction, []event.Event, error) {
 	evt := event.EntityUpdated{
 		EntityID: f.id.String(),

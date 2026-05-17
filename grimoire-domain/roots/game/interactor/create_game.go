@@ -10,13 +10,6 @@ import (
 	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
 )
 
-// GameRepository is the persistence port for the Game aggregate.
-// Defined locally to avoid importing the port package.
-type GameRepository interface {
-	Save(ctx context.Context, game entity.Game) error
-	Load(ctx context.Context, id identity.GameID) (entity.Game, error)
-}
-
 // CreateGameRequest holds the input for creating a new game.
 type CreateGameRequest struct {
 	CallerID string          // verified Firebase UID — set by API layer

@@ -1,0 +1,85 @@
+package interactor
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	characterentity "github.com/chwarner-solo/grimoire/grimoire-domain/roots/character/entity"
+	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/event"
+	"github.com/chwarner-solo/grimoire/grimoire-domain/shared/identity"
+	shared "github.com/chwarner-solo/grimoire/grimoire-domain/shared/interactor"
+)
+
+type BeginNPCDraftRequest struct {
+	CallerID string
+	NPCID    identity.NarrativeCharacterID
+	GameID   identity.GameID
+	Source   event.Source
+}
+
+type BeginNPCDraftResult struct {
+	NPC    characterentity.DraftNPC
+	Events []event.Event
+}
+
+type BeginNPCDraftInteractor struct {
+	gameRepo GameRepository
+	npcRepo  NPCRepository
+	bus      event.EventBus
+}
+
+func NewBeginNPCDraftInteractor(gameRepo GameRepository, npcRepo NPCRepository, bus event.EventBus) *BeginNPCDraftInteractor {
+	return &BeginNPCDraftInteractor{gameRepo: gameRepo, npcRepo: npcRepo, bus: bus}
+}
+
+func (i *BeginNPCDraftInteractor) Execute(ctx context.Context, req BeginNPCDraftRequest) (BeginNPCDraftResult, error) {
+	game, err := i.gameRepo.Load(ctx, req.GameID)
+	if err != nil {
+		return BeginNPCDraftResult{}, fmt.Errorf("%w: %v", ErrGameNotFound, err)
+	}
+
+	if req.CallerID != game.GMID() {
+		return BeginNPCDraftResult{}, shared.ErrUnauthorized
+	}
+
+	snap, err := i.npcRepo.Load(ctx, req.NPCID)
+	if err != nil {
+		return BeginNPCDraftResult{}, fmt.Errorf("%w: %v", ErrNPCNotFound, err)
+	}
+
+	npc, err := characterentity.ReconstituteNPC(snap)
+	if err != nil {
+		return BeginNPCDraftResult{}, err
+	}
+
+	nf, ok := npc.(characterentity.NewNPC)
+	if !ok {
+		return BeginNPCDraftResult{}, fmt.Errorf("%w: npc must be New to begin draft", ErrInvalidNPCState)
+	}
+
+	draft, events, err := nf.BeginDraft(req.Source)
+	if err != nil {
+		return BeginNPCDraftResult{}, err
+	}
+
+	if err := i.npcRepo.Save(ctx, draft.Snapshot()); err != nil {
+		return BeginNPCDraftResult{}, fmt.Errorf("%w: %v", ErrRepositorySaveFailed, err)
+	}
+
+	for _, evt := range events {
+		envelope := event.EventEnvelope{
+			Type:          evt.EventType(),
+			AggregateID:   identity.GrimoireID(req.NPCID.GrimoireID),
+			AggregateType: event.AggregateCharacter,
+			Source:        req.Source,
+			OccurredAt:    time.Now(),
+			Payload:       evt,
+		}
+		if err := i.bus.Dispatch(ctx, envelope); err != nil {
+			return BeginNPCDraftResult{}, fmt.Errorf("%w: %v", ErrEventDispatchFailed, err)
+		}
+	}
+
+	return BeginNPCDraftResult{NPC: draft, Events: events}, nil
+}

@@ -36,8 +36,10 @@ type DraftFaction interface {
 type ActiveFaction interface {
 	Faction
 	AddMember(membershipID identity.FactionMembershipID, source event.Source) (ActiveFaction, []event.Event, error)
+	AddStandingLevel(level value.StandingLevel, source event.Source) (ActiveFaction, []event.Event, error)
 	AddAlly(allyID identity.FactionID, source event.Source) (ActiveFaction, []event.Event, error)
 	DeclareWar(enemyID identity.FactionID, source event.Source) (ActiveFaction, []event.Event, error)
+	Reveal(to []string, sessionID identity.SessionID, source event.Source) (ActiveFaction, []event.Event, error)
 	MarkDormant(source event.Source) (IdleFaction, []event.Event, error)
 	Archive(source event.Source) (ArchivedFaction, []event.Event, error)
 }

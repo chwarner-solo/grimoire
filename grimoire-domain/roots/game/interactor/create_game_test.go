@@ -15,6 +15,7 @@ import (
 type stubGameRepository struct {
 	savedGame entity.Game
 	saveErr   error
+	loadErr   error
 }
 
 func (r *stubGameRepository) Save(_ context.Context, game entity.Game) error {
@@ -23,6 +24,9 @@ func (r *stubGameRepository) Save(_ context.Context, game entity.Game) error {
 }
 
 func (r *stubGameRepository) Load(_ context.Context, _ identity.GameID) (entity.Game, error) {
+	if r.loadErr != nil {
+		return nil, r.loadErr
+	}
 	return r.savedGame, nil
 }
 

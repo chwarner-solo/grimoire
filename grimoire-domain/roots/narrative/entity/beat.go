@@ -171,6 +171,25 @@ func (b *Beat) AddPrerequisite(prerequisiteID identity.BeatID) {
 	b.prerequisiteSets[0] = append(b.prerequisiteSets[0], prerequisiteID)
 }
 
+// PromoteToMaster promotes a campaign-scoped Beat to master scope.
+// Returns ErrBeatAlreadyMasterScope if the beat is already master scope.
+func (b *Beat) PromoteToMaster(source event.Source) ([]event.Event, error) {
+	if b.scope == value.BeatScopeMaster {
+		return nil, ErrBeatAlreadyMasterScope
+	}
+	oldScope := string(b.scope)
+	b.scope = value.BeatScopeMaster
+	b.campaignID = identity.CampaignID{}
+	evt := event.EntityUpdated{
+		EntityID: b.id.String(),
+		Field:    "scope",
+		OldValue: oldScope,
+		NewValue: string(value.BeatScopeMaster),
+		Source:   source,
+	}
+	return []event.Event{evt}, nil
+}
+
 // --- Getters ---
 
 func (b *Beat) BeatID() identity.BeatID          { return b.id }

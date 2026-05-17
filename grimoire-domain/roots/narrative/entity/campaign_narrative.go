@@ -16,6 +16,7 @@ type CampaignNarrative struct {
 	campaignID         identity.CampaignID
 	gameID             identity.GameID
 	discoveredBeatIDs  []identity.BeatID
+	campaignBeatIDs    []identity.BeatID
 	exploredSceneIDs   []identity.SceneID
 	visitedLocationIDs []identity.LocationID
 }
@@ -184,6 +185,11 @@ func (cn *CampaignNarrative) MarkLocationVisited(locationID identity.LocationID)
 	return []event.Event{evt}, nil
 }
 
+// AddCampaignBeat records a campaign-specific beat created at the table.
+func (cn *CampaignNarrative) AddCampaignBeat(id identity.BeatID) {
+	cn.campaignBeatIDs = append(cn.campaignBeatIDs, id)
+}
+
 // --- Snapshot / Reconstitute ---
 
 type CampaignNarrativeSnapshot struct {
@@ -191,6 +197,7 @@ type CampaignNarrativeSnapshot struct {
 	CampaignID         identity.CampaignID
 	GameID             identity.GameID
 	DiscoveredBeatIDs  []identity.BeatID
+	CampaignBeatIDs    []identity.BeatID
 	ExploredSceneIDs   []identity.SceneID
 	VisitedLocationIDs []identity.LocationID
 }
@@ -198,6 +205,8 @@ type CampaignNarrativeSnapshot struct {
 func (cn *CampaignNarrative) Snapshot() CampaignNarrativeSnapshot {
 	beatIDs := make([]identity.BeatID, len(cn.discoveredBeatIDs))
 	copy(beatIDs, cn.discoveredBeatIDs)
+	campaignBeatIDs := make([]identity.BeatID, len(cn.campaignBeatIDs))
+	copy(campaignBeatIDs, cn.campaignBeatIDs)
 	sceneIDs := make([]identity.SceneID, len(cn.exploredSceneIDs))
 	copy(sceneIDs, cn.exploredSceneIDs)
 	locIDs := make([]identity.LocationID, len(cn.visitedLocationIDs))
@@ -207,6 +216,7 @@ func (cn *CampaignNarrative) Snapshot() CampaignNarrativeSnapshot {
 		CampaignID:         cn.campaignID,
 		GameID:             cn.gameID,
 		DiscoveredBeatIDs:  beatIDs,
+		CampaignBeatIDs:    campaignBeatIDs,
 		ExploredSceneIDs:   sceneIDs,
 		VisitedLocationIDs: locIDs,
 	}
@@ -215,6 +225,8 @@ func (cn *CampaignNarrative) Snapshot() CampaignNarrativeSnapshot {
 func ReconstituteCampaignNarrative(snap CampaignNarrativeSnapshot) *CampaignNarrative {
 	beatIDs := make([]identity.BeatID, len(snap.DiscoveredBeatIDs))
 	copy(beatIDs, snap.DiscoveredBeatIDs)
+	campaignBeatIDs := make([]identity.BeatID, len(snap.CampaignBeatIDs))
+	copy(campaignBeatIDs, snap.CampaignBeatIDs)
 	sceneIDs := make([]identity.SceneID, len(snap.ExploredSceneIDs))
 	copy(sceneIDs, snap.ExploredSceneIDs)
 	locIDs := make([]identity.LocationID, len(snap.VisitedLocationIDs))
@@ -224,6 +236,7 @@ func ReconstituteCampaignNarrative(snap CampaignNarrativeSnapshot) *CampaignNarr
 		campaignID:         snap.CampaignID,
 		gameID:             snap.GameID,
 		discoveredBeatIDs:  beatIDs,
+		campaignBeatIDs:    campaignBeatIDs,
 		exploredSceneIDs:   sceneIDs,
 		visitedLocationIDs: locIDs,
 	}
