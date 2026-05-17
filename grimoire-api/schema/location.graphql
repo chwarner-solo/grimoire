@@ -1,0 +1,53 @@
+extend type Mutation {
+
+  """Create a Location. parentId is optional — omit for top-level."""
+  createLocation(input: CreateLocationInput!): MutationResult!
+
+  """Activate a Location. Transitions Draft → Active."""
+  activateLocation(input: LocationLifecycleInput!): MutationResult!
+
+  """Add a Scene to a Draft or Active Location."""
+  addScene(input: AddSceneInput!): MutationResult!
+
+  """
+  Create a directed travel connection from one Location to another.
+  For symmetric (A↔B) connections call twice.
+  """
+  connectLocations(input: ConnectLocationsInput!): MutationResult!
+
+  """Archive a Location. Terminal. Cascades to children."""
+  archiveLocation(input: LocationLifecycleInput!): MutationResult!
+}
+
+# Correction 3 (ADR-028 Amendment 001): dropped description, added locationType.
+enum LocationType {
+  WORLD
+  REGION
+  SETTLEMENT
+  BUILDING
+  SCENE
+}
+
+input CreateLocationInput {
+  gameId:       ID!
+  name:         String!
+  locationType: LocationType!
+  parentId:     ID
+}
+
+input LocationLifecycleInput {
+  locationId: ID!
+  gameId:     ID!
+}
+
+input AddSceneInput {
+  locationId: ID!
+  gameId:     ID!
+  name:       String!
+}
+
+input ConnectLocationsInput {
+  fromId: ID!
+  toId:   ID!
+  gameId: ID!
+}

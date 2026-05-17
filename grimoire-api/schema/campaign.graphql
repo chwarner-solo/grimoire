@@ -1,0 +1,72 @@
+extend type Mutation {
+
+  """Create a Campaign linked to a Game."""
+  createCampaign(input: CreateCampaignInput!): MutationResult!
+
+  """Add a PlayerCharacter to a New or Forming Campaign."""
+  addCharacterToCampaign(input: AddCharacterToCampaignInput!): MutationResult!
+
+  """Begin party formation. Campaign transitions New → Forming."""
+  beginCampaignFormation(input: BeginCampaignFormationInput!): MutationResult!
+
+  """Start the first session. Campaign transitions Forming → Active."""
+  startFirstSession(input: StartFirstSessionInput!): MutationResult!
+
+  """Start a follow-on session. Campaign transitions Idle → Active."""
+  startNewSession(input: StartNewSessionInput!): MutationResult!
+
+  """End the current session. Campaign transitions Active → Idle."""
+  endSession(input: EndSessionInput!): MutationResult!
+
+  """Move the party to a new Location. Campaign must be Active."""
+  moveParty(input: MovePartyInput!): MutationResult!
+
+  """Complete a Campaign. Campaign transitions Idle → Complete. Terminal."""
+  completeCampaign(input: CompleteCampaignInput!): MutationResult!
+}
+
+input CreateCampaignInput {
+  gameId: ID!
+  name:   String!
+}
+
+input AddCharacterToCampaignInput {
+  campaignId:  ID!
+  gameId:      ID!
+  characterId: ID!
+}
+
+input BeginCampaignFormationInput {
+  campaignId: ID!
+  gameId:     ID!
+}
+
+input StartFirstSessionInput {
+  campaignId: ID!
+  gameId:     ID!
+  date:       Date!
+}
+
+input StartNewSessionInput {
+  campaignId: ID!
+  gameId:     ID!
+  date:       Date!
+}
+
+input EndSessionInput {
+  campaignId: ID!
+  gameId:     ID!
+  sessionId:  ID!
+  notes:      String
+}
+
+input MovePartyInput {
+  campaignId: ID!
+  gameId:     ID!
+  locationId: ID!
+}
+
+input CompleteCampaignInput {
+  campaignId: ID!
+  gameId:     ID!
+}

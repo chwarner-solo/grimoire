@@ -1,0 +1,16 @@
+extend type Mutation {
+
+  """Create a new Game. The GM owns everything beneath it."""
+  createGame(input: CreateGameInput!): MutationResult!
+
+  """Archive a completed Game. Game must be Idle."""
+  archiveGame(input: ArchiveGameInput!): MutationResult!
+}
+
+input CreateGameInput {
+  name: String!
+}
+
+input ArchiveGameInput {
+  gameId: ID!
+}

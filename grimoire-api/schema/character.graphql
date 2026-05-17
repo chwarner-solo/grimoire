@@ -1,0 +1,117 @@
+extend type Mutation {
+
+  # ── NPC ─────────────────────────────────────────────────────────────────
+
+  """Create a new NPC."""
+  createNPC(input: CreateNPCInput!): MutationResult!
+
+  """Begin drafting an NPC. Transitions New → Draft."""
+  beginNPCDraft(input: NPCLifecycleInput!): MutationResult!
+
+  """Update content fields on a Draft or Active NPC."""
+  updateNPCContent(input: UpdateNPCContentInput!): MutationResult!
+
+  """Activate an NPC. Transitions Draft → Active."""
+  activateNPC(input: NPCLifecycleInput!): MutationResult!
+
+  """Archive an NPC. Terminal. Works from Active or Idle."""
+  archiveNPC(input: NPCLifecycleInput!): MutationResult!
+
+  # ── PlayerCharacter ──────────────────────────────────────────────────────
+
+  """Create a PlayerCharacter. ownerPlayerId is optional."""
+  createPlayerCharacter(input: CreatePlayerCharacterInput!): MutationResult!
+
+  """Update content fields on a PlayerCharacter."""
+  updatePlayerCharacterContent(input: UpdatePCContentInput!): MutationResult!
+
+  """Retire a PlayerCharacter. Terminal."""
+  retirePlayerCharacter(input: PCLifecycleInput!): MutationResult!
+
+  # ── MacGuffin ────────────────────────────────────────────────────────────
+
+  """Create a narratively significant item."""
+  createMacGuffin(input: CreateMacGuffinInput!): MutationResult!
+
+  """Update content fields on a MacGuffin."""
+  updateMacGuffinContent(input: UpdateMacGuffinContentInput!): MutationResult!
+
+  """Assign a MacGuffin to an NPC."""
+  assignMacGuffinToNPC(input: AssignMacGuffinToNPCInput!): MutationResult!
+
+  """Assign a MacGuffin to a PlayerCharacter."""
+  assignMacGuffinToPC(input: AssignMacGuffinToPCInput!): MutationResult!
+
+  """Destroy a MacGuffin. Terminal."""
+  destroyMacGuffin(input: MacGuffinLifecycleInput!): MutationResult!
+}
+
+input CreateNPCInput {
+  gameId: ID!
+  name:   String!
+}
+
+input NPCLifecycleInput {
+  npcId:  ID!
+  gameId: ID!
+}
+
+input UpdateNPCContentInput {
+  npcId:       ID!
+  gameId:      ID!
+  name:        String!
+  description: String!
+  playerDesc:  String!
+}
+
+input CreatePlayerCharacterInput {
+  gameId:        ID!
+  name:          String!
+  ownerPlayerId: ID
+}
+
+input UpdatePCContentInput {
+  characterId: ID!
+  gameId:      ID!
+  name:        String!
+  description: String!
+  playerDesc:  String!
+}
+
+input PCLifecycleInput {
+  characterId: ID!
+  gameId:      ID!
+}
+
+# Correction 5 (ADR-028 Amendment 001): stripped content fields.
+# Content is set via updateMacGuffinContent after creation.
+input CreateMacGuffinInput {
+  gameId: ID!
+  name:   String!
+}
+
+# Added by ADR-028 Amendment 001 (Correction 5) + ADR-026 Amendment 001.
+input UpdateMacGuffinContentInput {
+  macGuffinId: ID!
+  gameId:      ID!
+  name:        String!
+  description: String!
+  playerDesc:  String!
+}
+
+input AssignMacGuffinToNPCInput {
+  macGuffinId: ID!
+  npcId:       ID!
+  gameId:      ID!
+}
+
+input AssignMacGuffinToPCInput {
+  macGuffinId: ID!
+  characterId: ID!
+  gameId:      ID!
+}
+
+input MacGuffinLifecycleInput {
+  macGuffinId: ID!
+  gameId:      ID!
+}

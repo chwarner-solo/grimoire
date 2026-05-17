@@ -1,0 +1,65 @@
+extend type Mutation {
+
+  """Create a new Faction."""
+  createFaction(input: CreateFactionInput!): MutationResult!
+
+  """Begin drafting a Faction. Transitions New → Draft."""
+  beginFactionDraft(input: FactionLifecycleInput!): MutationResult!
+
+  """Activate a Faction. Transitions Draft → Active."""
+  activateFaction(input: FactionLifecycleInput!): MutationResult!
+
+  """Add an NPC member to a Draft or Active Faction."""
+  addFactionMember(input: AddFactionMemberInput!): MutationResult!
+
+  """Add a standing level definition to a Faction."""
+  addStandingLevel(input: AddStandingLevelInput!): MutationResult!
+
+  """Declare an ally relationship between two Factions."""
+  declareAlly(input: FactionRelationshipInput!): MutationResult!
+
+  """Declare a war relationship between two Factions."""
+  declareWar(input: FactionRelationshipInput!): MutationResult!
+
+  """Mark a Faction dormant. Transitions Active → Idle."""
+  markFactionDormant(input: FactionLifecycleInput!): MutationResult!
+
+  """Reactivate a dormant Faction. Transitions Idle → Active."""
+  reactivateFaction(input: FactionLifecycleInput!): MutationResult!
+
+  """Archive a Faction. Terminal. Works from Active or Idle."""
+  archiveFaction(input: FactionLifecycleInput!): MutationResult!
+}
+
+input CreateFactionInput {
+  gameId: ID!
+  name:   String!
+}
+
+input FactionLifecycleInput {
+  factionId: ID!
+  gameId:    ID!
+}
+
+# Correction 2 (ADR-028 Amendment 001): added rank field.
+input AddFactionMemberInput {
+  factionId: ID!
+  gameId:    ID!
+  npcId:     ID!
+  rank:      String!
+}
+
+# Correction 1 (ADR-028 Amendment 001): added ordinal field.
+input AddStandingLevelInput {
+  factionId: ID!
+  gameId:    ID!
+  name:      String!
+  threshold: Int!
+  ordinal:   Int!
+}
+
+input FactionRelationshipInput {
+  factionId: ID!
+  targetId:  ID!
+  gameId:    ID!
+}

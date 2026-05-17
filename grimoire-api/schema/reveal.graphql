@@ -1,0 +1,23 @@
+extend type Mutation {
+
+  """
+  Reveal an entity to one or more players mid-session.
+  entityType must be one of: NPC, PLAYER_CHARACTER, MACGUFFIN, FACTION.
+  """
+  revealEntity(input: RevealEntityInput!): MutationResult!
+}
+
+enum RevealableEntityType {
+  NPC
+  PLAYER_CHARACTER
+  MACGUFFIN
+  FACTION
+}
+
+input RevealEntityInput {
+  entityId:   ID!
+  entityType: RevealableEntityType!
+  gameId:     ID!
+  sessionId:  ID!
+  revealedTo: [ID!]!
+}

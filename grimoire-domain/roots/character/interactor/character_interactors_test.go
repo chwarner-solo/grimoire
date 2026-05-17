@@ -902,3 +902,118 @@ func TestDestroyMacGuffin_WrongCaller_ReturnsUnauthorized(t *testing.T) {
 		t.Fatalf("expected ErrUnauthorized, got: %v", err)
 	}
 }
+
+// === UpdateMacGuffinContent tests ===
+
+func TestUpdateMacGuffinContent_Succeeds(t *testing.T) {
+	game, gid := mustCharGame(t)
+	mgSnap, mgid := mustMGSnap(t, false, gid)
+	gameRepo := &stubCharGameRepo{game: game}
+	mgRepo := &stubMGRepo{snap: mgSnap}
+	bus := &spyCharBus{}
+	i := NewUpdateMacGuffinContentInteractor(gameRepo, mgRepo, bus)
+
+	result, err := i.Execute(context.Background(), UpdateMacGuffinContentRequest{
+		CallerID: "gm-uid", MacGuffinID: mgid, GameID: gid,
+		Name: "The Orb of Doom", Description: "A dark sphere.", PlayerDesc: "It hums.",
+		Source: event.SourceGrimoire,
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(result.Events) == 0 {
+		t.Fatal("expected events to be returned")
+	}
+	if len(bus.envelopes) != 1 {
+		t.Fatalf("expected 1 dispatched event, got %d", len(bus.envelopes))
+	}
+}
+
+func TestUpdateMacGuffinContent_WrongCaller_ReturnsUnauthorized(t *testing.T) {
+	game, gid := mustCharGame(t)
+	mgSnap, mgid := mustMGSnap(t, false, gid)
+	gameRepo := &stubCharGameRepo{game: game}
+	mgRepo := &stubMGRepo{snap: mgSnap}
+	i := NewUpdateMacGuffinContentInteractor(gameRepo, mgRepo, &spyCharBus{})
+
+	_, err := i.Execute(context.Background(), UpdateMacGuffinContentRequest{
+		CallerID: "wrong", MacGuffinID: mgid, GameID: gid,
+		Name: "The Orb", Description: "desc", PlayerDesc: "pdesc",
+		Source: event.SourceGrimoire,
+	})
+	if !errors.Is(err, shared.ErrUnauthorized) {
+		t.Fatalf("expected ErrUnauthorized, got: %v", err)
+	}
+}
+
+func TestUpdateMacGuffinContent_MacGuffinNotFound_ReturnsError(t *testing.T) {
+	game, gid := mustCharGame(t)
+	gameRepo := &stubCharGameRepo{game: game}
+	mgRepo := &stubMGRepo{loadErr: errors.New("not found")}
+	i := NewUpdateMacGuffinContentInteractor(gameRepo, mgRepo, &spyCharBus{})
+
+	_, err := i.Execute(context.Background(), UpdateMacGuffinContentRequest{
+		CallerID: "gm-uid", MacGuffinID: identity.NewMacGuffinID(), GameID: gid,
+		Name: "The Orb", Description: "desc", PlayerDesc: "pdesc",
+		Source: event.SourceGrimoire,
+	})
+	if !errors.Is(err, ErrMacGuffinNotFound) {
+		t.Fatalf("expected ErrMacGuffinNotFound, got: %v", err)
+	}
+}
+
+func TestUpdateMacGuffinContent_DestroyedMacGuffin_ReturnsError(t *testing.T) {
+	game, gid := mustCharGame(t)
+	mgSnap, mgid := mustMGSnap(t, true, gid)
+	gameRepo := &stubCharGameRepo{game: game}
+	mgRepo := &stubMGRepo{snap: mgSnap}
+	i := NewUpdateMacGuffinContentInteractor(gameRepo, mgRepo, &spyCharBus{})
+
+	_, err := i.Execute(context.Background(), UpdateMacGuffinContentRequest{
+		CallerID: "gm-uid", MacGuffinID: mgid, GameID: gid,
+		Name: "The Orb", Description: "desc", PlayerDesc: "pdesc",
+		Source: event.SourceGrimoire,
+	})
+	if err == nil {
+		t.Fatal("expected error for destroyed MacGuffin")
+	}
+}
+
+func TestUpdateMacGuffinContent_SaveFailure_NoDispatch(t *testing.T) {
+	game, gid := mustCharGame(t)
+	mgSnap, mgid := mustMGSnap(t, false, gid)
+	gameRepo := &stubCharGameRepo{game: game}
+	mgRepo := &stubMGRepo{snap: mgSnap, saveErr: errors.New("db down")}
+	bus := &spyCharBus{}
+	i := NewUpdateMacGuffinContentInteractor(gameRepo, mgRepo, bus)
+
+	_, err := i.Execute(context.Background(), UpdateMacGuffinContentRequest{
+		CallerID: "gm-uid", MacGuffinID: mgid, GameID: gid,
+		Name: "The Orb", Description: "desc", PlayerDesc: "pdesc",
+		Source: event.SourceGrimoire,
+	})
+	if !errors.Is(err, ErrRepositorySaveFailed) {
+		t.Fatalf("expected ErrRepositorySaveFailed, got: %v", err)
+	}
+	if len(bus.envelopes) != 0 {
+		t.Fatalf("expected 0 dispatched events after save failure, got %d", len(bus.envelopes))
+	}
+}
+
+func TestUpdateMacGuffinContent_DispatchFailure_ReturnsError(t *testing.T) {
+	game, gid := mustCharGame(t)
+	mgSnap, mgid := mustMGSnap(t, false, gid)
+	gameRepo := &stubCharGameRepo{game: game}
+	mgRepo := &stubMGRepo{snap: mgSnap}
+	bus := &spyCharBus{dispatchErr: errors.New("bus down")}
+	i := NewUpdateMacGuffinContentInteractor(gameRepo, mgRepo, bus)
+
+	_, err := i.Execute(context.Background(), UpdateMacGuffinContentRequest{
+		CallerID: "gm-uid", MacGuffinID: mgid, GameID: gid,
+		Name: "The Orb", Description: "desc", PlayerDesc: "pdesc",
+		Source: event.SourceGrimoire,
+	})
+	if !errors.Is(err, ErrEventDispatchFailed) {
+		t.Fatalf("expected ErrEventDispatchFailed, got: %v", err)
+	}
+}

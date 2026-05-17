@@ -1,0 +1,13 @@
+scalar DateTime   # RFC3339 string — Go time.Time
+scalar Date       # ISO 8601 date — Go time.Time (date only)
+
+"""
+Returned by every mutation. Callers use the ID to issue a follow-up
+query if they need rich data about the resulting state.
+"""
+type MutationResult {
+  id:     ID!      # ID of the created or updated entity
+  status: String!  # current lifecycle state (e.g. "new", "active", "archived")
+}
+
+type Mutation

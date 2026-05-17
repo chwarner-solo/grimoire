@@ -1,0 +1,89 @@
+extend type Mutation {
+
+  """Create a Beat scoped to the MasterNarrative."""
+  createMasterBeat(input: CreateMasterBeatInput!): MutationResult!
+
+  """Update content fields on any Beat."""
+  updateBeatContent(input: UpdateBeatContentInput!): MutationResult!
+
+  """Add a prerequisite relationship between two Beats."""
+  addBeatPrerequisite(input: AddBeatPrerequisiteInput!): MutationResult!
+
+  """Add an Act reference to the MasterNarrative."""
+  addActToMasterNarrative(input: AddActInput!): MutationResult!
+
+  """Add a Secret reference to the MasterNarrative."""
+  addSecretToMasterNarrative(input: AddSecretInput!): MutationResult!
+
+  """Add a Lore reference to the MasterNarrative."""
+  addLoreToMasterNarrative(input: AddLoreInput!): MutationResult!
+
+  """Discover a Beat for a Campaign. Called at the table."""
+  discoverBeat(input: DiscoverBeatInput!): MutationResult!
+
+  """Create a campaign-specific Beat improvised at the table."""
+  createCampaignBeat(input: CreateCampaignBeatInput!): MutationResult!
+
+  """Promote a campaign-specific Beat to MasterNarrative scope."""
+  promoteBeatToMaster(input: PromoteBeatInput!): MutationResult!
+}
+
+enum BeatType {
+  REQUIRED
+  OPTIONAL
+  CAMPAIGN_SPECIFIC
+}
+
+input CreateMasterBeatInput {
+  gameId:   ID!
+  name:     String!
+  beatType: BeatType!
+}
+
+input UpdateBeatContentInput {
+  beatId:      ID!
+  gameId:      ID!
+  name:        String!
+  description: String!
+  playerDesc:  String!
+}
+
+input AddBeatPrerequisiteInput {
+  beatId:         ID!
+  prerequisiteId: ID!
+  gameId:         ID!
+}
+
+input AddActInput {
+  gameId: ID!
+  actId:  ID!
+}
+
+input AddSecretInput {
+  gameId:   ID!
+  secretId: ID!
+}
+
+input AddLoreInput {
+  gameId: ID!
+  loreId: ID!
+}
+
+input DiscoverBeatInput {
+  campaignNarrativeId: ID!
+  beatId:              ID!
+  gameId:              ID!
+}
+
+# Correction 4 (ADR-028 Amendment 001): dropped description and playerDesc.
+# Content is set via updateBeatContent after creation.
+input CreateCampaignBeatInput {
+  campaignId: ID!
+  gameId:     ID!
+  name:       String!
+}
+
+input PromoteBeatInput {
+  beatId: ID!
+  gameId: ID!
+}
