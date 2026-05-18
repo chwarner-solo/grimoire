@@ -23,6 +23,7 @@ grimoire/main/
   docs/
     adr/                           ← Architecture Decision Records
     workflows/                     ← GM operational workflow documentation
+    ui/                            ← Screen designs and UI specifications
   grimoire-domain/                 ← pure domain, zero infrastructure
     go.mod
     roots/
@@ -362,3 +363,18 @@ workflows record how the system is used.
 | WORKFLOW-002 | Session Operation |
 
 See `docs/workflows/` for full workflow documentation.
+
+---
+
+## UI Document Index
+
+Screen designs and interaction flows for the GM PWA. UI documents specify
+the exact query shapes needed per screen — they drive ADR-030 (GraphQL
+Query Schema).
+
+| Document | Title |
+|----------|-------|
+| UI-001 | GM Application — Screens & Flows (World Building) |
+| UI-002 | GM Application — Session Operation Screens |
+
+See `docs/ui/` for full specifications.

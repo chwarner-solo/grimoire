@@ -59,6 +59,17 @@ and in what order; ADRs record why design decisions were made.
 | [WORKFLOW-001](docs/workflows/Workflow-001_world-building-session-prep.md) | World Building & Session Prep |
 | [WORKFLOW-002](docs/workflows/Workflow-002_session-operation.md) | Session Operation |
 
+## UI Documentation
+
+Screen specifications and interaction flows for the GM PWA. Every screen
+calls out the queries it requires — these documents drive ADR-030 (GraphQL
+Query Schema).
+
+| Document | Title |
+|----------|-------|
+| [UI-001](docs/ui/UI-001_GM-Application-Screens-Creation-Workflow.md) | GM Application — Screens & Flows (World Building) |
+| [UI-002](docs/ui/UI-002_Session-Operation-Screens.md) | GM Application — Session Operation Screens |
+
 ## Architecture Decision Records
 
 Design decisions are documented as ADRs in [`docs/adr/`](docs/adr/).
