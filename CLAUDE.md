@@ -346,6 +346,7 @@ type EventEnvelope struct {
 | ADR-028 | GraphQL Mutation Schema |
 | ADR-028-Amendment-001 | GraphQL Schema Corrections |
 | ADR-029 | GM Web Application Architecture |
+| ADR-030 | GraphQL Query Schema |
 
 See `docs/adr/` for full records.
 

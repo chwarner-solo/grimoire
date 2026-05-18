@@ -112,3 +112,4 @@ Design decisions are documented as ADRs in [`docs/adr/`](docs/adr/).
 | [ADR-028](docs/adr/ADR-028_Graphql-Mutation-Schema.md) | GraphQL Mutation Schema |
 | [ADR-028-Amendment-001](docs/adr/ADR-028_Amendment-001_schema-corrections.md) | GraphQL Schema Corrections |
 | [ADR-029](docs/adr/ADR-029_GM-Web-Application-architecture.md) | GM Web Application Architecture |
+| [ADR-030](docs/adr/ADR-030_GraphQL_Query_Schema.md) | GraphQL Query Schema |
