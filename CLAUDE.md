@@ -62,6 +62,11 @@ grimoire/main/
     go.mod
     cmd/
     internal/
+  grimoire-pwa/                    ← GM web application (PWA, not a Go module)
+    package.json
+    vite.config.ts
+    tsconfig.json
+    src/
 ```
 
 **Dependency rule — arrows point inward only:**
@@ -339,6 +344,7 @@ type EventEnvelope struct {
 | ADR-027 | RevealEntity Interactor |
 | ADR-028 | GraphQL Mutation Schema |
 | ADR-028-Amendment-001 | GraphQL Schema Corrections |
+| ADR-029 | GM Web Application Architecture |
 
 See `docs/adr/` for full records.
 
