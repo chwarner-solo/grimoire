@@ -47,9 +47,20 @@ cd grimoire-domain && go test ./...
 go vet ./...
 ```
 
+## Workflows
+
+Operational sequences showing how the system is used end-to-end from the GM's
+perspective. Distinct from ADRs — workflows describe what commands are called
+and in what order; ADRs record why design decisions were made.
+
+| Workflow | Title |
+|----------|-------|
+| [WORKFLOW-001](docs/workflows/Workflow-001_world-building-session-prep.md) | World Building & Session Prep |
+| [WORKFLOW-002](docs/workflows/Workflow-002_session-operation.md) | Session Operation |
+
 ## Architecture Decision Records
 
-Design decisions are documented as ADRs in [`grimoire-domain/docs/adr/`](docs/adr/).
+Design decisions are documented as ADRs in [`docs/adr/`](docs/adr/).
 
 | ADR | Title |
 |-----|-------|
@@ -64,6 +75,7 @@ Design decisions are documented as ADRs in [`grimoire-domain/docs/adr/`](docs/ad
 | [ADR-009](docs/adr/ADR-009_Bidirectional-Event-Mapping.md) | Bidirectional Event Mapping |
 | [ADR-010](docs/adr/ADR-010_Three-Stores-Architecture.md) | Three Stores Architecture |
 | [ADR-011](docs/adr/ADR-011_Domain-Event-Chaining.md) | Domain Event Chaining |
+| [ADR-011-Amendment-001](docs/adr/ADR-011_Amendment-001_Event-Delivery_Guarantees.md) | Event Delivery Guarantees and Projection Semantics |
 | [ADR-012](docs/adr/ADR-012_Event-Sequencing.md) | Event Sequencing |
 | [ADR-013](docs/adr/ADR-013_Four-Module-Workspace.md) | Four Module Workspace |
 | [ADR-014](docs/adr/ADR-014_Scaling_Path_BigTable.md) | Scaling Path — Firestore to Bigtable |
@@ -83,5 +95,7 @@ Design decisions are documented as ADRs in [`grimoire-domain/docs/adr/`](docs/ad
 | [ADR-024](docs/adr/ADR-024_Faction-Interactors.md) | Faction Interactors |
 | [ADR-025](docs/adr/ADR-015_Location-Interactors.md) | Location Interactors |
 | [ADR-026](docs/adr/ADR-026_Character-Interactors.md) | Character Interactors |
+| [ADR-026-Amendment-001](docs/adr/ADR-026_Amendment-001_Update-MacGuffin-Content.md) | UpdateMacGuffinContent Interactor |
 | [ADR-027](docs/adr/ADR-027_RevealEntity-Interactor.md) | RevealEntity Interactor |
 | [ADR-028](docs/adr/ADR-028_Graphql-Mutation-Schema.md) | GraphQL Mutation Schema |
+| [ADR-028-Amendment-001](docs/adr/ADR-028_Amendment-001_schema-corrections.md) | GraphQL Schema Corrections |
