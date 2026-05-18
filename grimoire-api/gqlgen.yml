@@ -1,0 +1,19 @@
+schema:
+  - schema/*.graphql
+
+exec:
+  filename: internal/generated/generated.go
+  package: generated
+
+model:
+  filename: internal/generated/models_gen.go
+  package: generated
+
+resolver:
+  layout: follow-schema
+  dir: internal/resolver
+  package: resolver
+
+models:
+  MutationResult:
+    model: github.com/chwarner-solo/grimoire/grimoire-api/internal/model.MutationResult
