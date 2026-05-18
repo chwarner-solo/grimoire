@@ -1,0 +1,334 @@
+scalar DateTime
+scalar Date
+
+enum EntityStatus {
+  NEW
+  DRAFT
+  FORMING
+  ACTIVE
+  IDLE
+  COMPLETE
+  ARCHIVED
+  RETIRED
+}
+
+enum BeatScope {
+  MASTER
+  CAMPAIGN
+}
+
+enum ConnectionDirection {
+  OUTBOUND
+  INBOUND
+  BOTH
+}
+
+type Query {
+  """All games owned by the authenticated GM."""
+  games: [GameSummary!]!
+
+  """A single game by ID. Returns null if not found or not owned by caller."""
+  game(id: ID!): GameDetail
+
+  """All campaigns for a game."""
+  campaigns(gameId: ID!): [CampaignSummary!]!
+
+  """A single campaign."""
+  campaign(id: ID!, gameId: ID!): CampaignDetail
+
+  """Session-time state for the Party Tab."""
+  campaignSessionState(id: ID!, gameId: ID!): CampaignSessionState
+
+  """Campaign beats created during sessions (scope: campaign)."""
+  campaignBeats(campaignId: ID!, gameId: ID!): [BeatSummary!]!
+
+  """All locations for a game as a flat list with parentId."""
+  locations(gameId: ID!): [LocationSummary!]!
+
+  """Single location with scenes and connections."""
+  location(id: ID!, gameId: ID!): LocationDetail
+
+  """Active locations only. Used in MoveParty modal."""
+  activeLocations(gameId: ID!): [LocationSummary!]!
+
+  """All master beats for a game."""
+  masterNarrative(gameId: ID!): MasterNarrativeView
+
+  """Single beat with full content and prerequisites."""
+  beat(id: ID!, gameId: ID!): BeatDetail
+
+  """Beats available to a campaign given its current discoveredBeatIDs."""
+  availableBeats(campaignNarrativeId: ID!, gameId: ID!): [BeatSummary!]!
+
+  """All beats discovered by a campaign, with session attribution."""
+  discoveredBeats(campaignNarrativeId: ID!, gameId: ID!): [DiscoveredBeat!]!
+
+  """All factions for a game."""
+  factions(gameId: ID!): [FactionSummary!]!
+
+  """Single faction with full detail."""
+  faction(id: ID!, gameId: ID!): FactionDetail
+
+  """All NPCs for a game."""
+  npcs(gameId: ID!, excludeArchived: Boolean): [NPCSummary!]!
+
+  """Single NPC with full content and faction memberships."""
+  npc(id: ID!, gameId: ID!): NPCDetail
+
+  """All player characters for a game."""
+  playerCharacters(gameId: ID!): [PlayerCharacterSummary!]!
+
+  """All MacGuffins for a game."""
+  macguffins(gameId: ID!): [MacGuffinSummary!]!
+
+  """Pre-session launch state."""
+  sessionLauncher(campaignId: ID!, gameId: ID!): SessionLauncherState
+
+  """End-of-session summary."""
+  sessionSummary(sessionId: ID!, gameId: ID!): SessionSummary
+}
+
+# --- Game ---
+
+type GameSummary {
+  id:             ID!
+  name:           String!
+  status:         EntityStatus!
+  campaignCount:  Int!
+  lastActivityAt: DateTime
+}
+
+type GameDetail {
+  id:     ID!
+  name:   String!
+  status: EntityStatus!
+
+  locationSummary: EntityCountSummary!
+  factionSummary:  EntityCountSummary!
+  npcSummary:      EntityCountSummary!
+
+  campaigns: [CampaignSummary!]!
+}
+
+type EntityCountSummary {
+  draft:    Int!
+  active:   Int!
+  idle:     Int!
+  archived: Int!
+}
+
+# --- Campaign ---
+
+type CampaignSummary {
+  id:             ID!
+  name:           String!
+  status:         EntityStatus!
+  characterCount: Int!
+  sessionCount:   Int!
+}
+
+type CampaignDetail {
+  id:           ID!
+  name:         String!
+  status:       EntityStatus!
+  sessionCount: Int!
+  characters:   [PlayerCharacterSummary!]!
+}
+
+type CampaignSessionState {
+  id:        ID!
+  name:      String!
+  status:    EntityStatus!
+  sessionId: ID!
+
+  currentLocation: LocationWithConnections
+
+  characters: [PlayerCharacterSummary!]!
+}
+
+type LocationWithConnections {
+  id:           ID!
+  name:         String!
+  locationType: LocationType!
+  connections:  [LocationConnection!]!
+}
+
+type LocationConnection {
+  toLocation: LocationSummary!
+  direction:  ConnectionDirection!
+}
+
+# --- Location ---
+
+type LocationSummary {
+  id:           ID!
+  name:         String!
+  locationType: LocationType!
+  status:       EntityStatus!
+  parentId:     ID
+  sceneCount:   Int!
+  childCount:   Int!
+}
+
+type LocationDetail {
+  id:           ID!
+  name:         String!
+  locationType: LocationType!
+  status:       EntityStatus!
+  parentLocation: LocationSummary
+
+  scenes:      [SceneSummary!]!
+  connections: [LocationConnection!]!
+}
+
+type SceneSummary {
+  id:   ID!
+  name: String!
+}
+
+# --- Narrative ---
+
+type MasterNarrativeView {
+  id:    ID!
+  beats: [BeatSummary!]!
+}
+
+type BeatSummary {
+  id:                ID!
+  name:              String!
+  beatType:          BeatType!
+  scope:             BeatScope!
+  prerequisiteCount: Int!
+}
+
+type BeatDetail {
+  id:                ID!
+  name:              String!
+  beatType:          BeatType!
+  scope:             BeatScope!
+  description:       String!
+  playerDescription: String!
+  prerequisites:     [BeatSummary!]!
+}
+
+type DiscoveredBeat {
+  id:                  ID!
+  name:                String!
+  beatType:            BeatType!
+  discoveredInSession: Int!
+}
+
+# --- Faction ---
+
+type FactionSummary {
+  id:                 ID!
+  name:               String!
+  status:             EntityStatus!
+  playerVisible:      Boolean!
+  memberCount:        Int!
+  standingLevelCount: Int!
+  allies:             [FactionRef!]!
+  enemies:            [FactionRef!]!
+}
+
+type FactionRef {
+  id:   ID!
+  name: String!
+}
+
+type FactionDetail {
+  id:            ID!
+  name:          String!
+  status:        EntityStatus!
+  playerVisible: Boolean!
+
+  members:       [FactionMember!]!
+  standingLevels: [StandingLevel!]!
+  allies:        [FactionRef!]!
+  enemies:       [FactionRef!]!
+}
+
+type FactionMember {
+  npc:  NPCRef!
+  rank: String!
+}
+
+type NPCRef {
+  id:   ID!
+  name: String!
+}
+
+type StandingLevel {
+  ordinal:   Int!
+  name:      String!
+  threshold: Int!
+}
+
+# --- Character ---
+
+type NPCSummary {
+  id:            ID!
+  name:          String!
+  status:        EntityStatus!
+  playerVisible: Boolean!
+}
+
+type NPCDetail {
+  id:                 ID!
+  name:               String!
+  status:             EntityStatus!
+  playerVisible:      Boolean!
+  description:        String!
+  playerDescription:  String!
+  factionMemberships: [FactionMembership!]!
+}
+
+type FactionMembership {
+  faction: FactionRef!
+  rank:    String!
+}
+
+type PlayerCharacterSummary {
+  id:            ID!
+  name:          String!
+  status:        EntityStatus!
+  ownerPlayerId: String
+}
+
+# --- MacGuffin ---
+
+type MacGuffinSummary {
+  id:            ID!
+  name:          String!
+  playerVisible: Boolean!
+  possessor:     MacGuffinPossessor
+}
+
+union MacGuffinPossessor = NPCRef | PlayerCharacterRef | LocationRef
+
+type PlayerCharacterRef {
+  id:   ID!
+  name: String!
+}
+
+type LocationRef {
+  id:   ID!
+  name: String!
+}
+
+# --- Session ---
+
+type SessionLauncherState {
+  campaignId:   ID!
+  campaignName: String!
+  status:       EntityStatus!
+  sessionCount: Int!
+  characters:   [PlayerCharacterSummary!]!
+}
+
+type SessionSummary {
+  sessionId:             ID!
+  beatsDiscoveredCount:  Int!
+  entitiesRevealedCount: Int!
+  finalLocation:         LocationRef
+}

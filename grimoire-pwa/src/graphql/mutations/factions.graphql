@@ -1,0 +1,48 @@
+mutation CreateFaction($input: CreateFactionInput!) {
+  createFaction(input: $input) {
+    id
+    status
+  }
+}
+
+mutation ActivateFaction($input: FactionLifecycleInput!) {
+  activateFaction(input: $input) {
+    id
+    status
+  }
+}
+
+mutation AddFactionMember($input: AddFactionMemberInput!) {
+  addFactionMember(input: $input) {
+    id
+    status
+  }
+}
+
+mutation AddStandingLevel($input: AddStandingLevelInput!) {
+  addStandingLevel(input: $input) {
+    id
+    status
+  }
+}
+
+mutation DeclareAlly($input: FactionRelationshipInput!) {
+  declareAlly(input: $input) {
+    id
+    status
+  }
+}
+
+mutation DeclareWar($input: FactionRelationshipInput!) {
+  declareWar(input: $input) {
+    id
+    status
+  }
+}
+
+mutation ArchiveFaction($input: FactionLifecycleInput!) {
+  archiveFaction(input: $input) {
+    id
+    status
+  }
+}

@@ -1,0 +1,21 @@
+query MacGuffins($gameId: ID!) {
+  macguffins(gameId: $gameId) {
+    id
+    name
+    playerVisible
+    possessor {
+      ... on NPCRef {
+        id
+        name
+      }
+      ... on PlayerCharacterRef {
+        id
+        name
+      }
+      ... on LocationRef {
+        id
+        name
+      }
+    }
+  }
+}

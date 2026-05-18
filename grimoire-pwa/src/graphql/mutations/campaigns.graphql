@@ -1,0 +1,20 @@
+mutation CreateCampaign($input: CreateCampaignInput!) {
+  createCampaign(input: $input) {
+    id
+    status
+  }
+}
+
+mutation BeginCampaignFormation($input: BeginCampaignFormationInput!) {
+  beginCampaignFormation(input: $input) {
+    id
+    status
+  }
+}
+
+mutation AddCharacterToCampaign($input: AddCharacterToCampaignInput!) {
+  addCharacterToCampaign(input: $input) {
+    id
+    status
+  }
+}

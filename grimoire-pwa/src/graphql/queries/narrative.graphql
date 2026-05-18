@@ -1,0 +1,59 @@
+query MasterNarrative($gameId: ID!) {
+  masterNarrative(gameId: $gameId) {
+    id
+    beats {
+      id
+      name
+      beatType
+      scope
+      prerequisiteCount
+    }
+  }
+}
+
+query Beat($id: ID!, $gameId: ID!) {
+  beat(id: $id, gameId: $gameId) {
+    id
+    name
+    beatType
+    scope
+    description
+    playerDescription
+    prerequisites {
+      id
+      name
+      beatType
+      scope
+      prerequisiteCount
+    }
+  }
+}
+
+query AvailableBeats($campaignNarrativeId: ID!, $gameId: ID!) {
+  availableBeats(campaignNarrativeId: $campaignNarrativeId, gameId: $gameId) {
+    id
+    name
+    beatType
+    scope
+    prerequisiteCount
+  }
+}
+
+query DiscoveredBeats($campaignNarrativeId: ID!, $gameId: ID!) {
+  discoveredBeats(campaignNarrativeId: $campaignNarrativeId, gameId: $gameId) {
+    id
+    name
+    beatType
+    discoveredInSession
+  }
+}
+
+query CampaignBeats($campaignId: ID!, $gameId: ID!) {
+  campaignBeats(campaignId: $campaignId, gameId: $gameId) {
+    id
+    name
+    beatType
+    scope
+    prerequisiteCount
+  }
+}

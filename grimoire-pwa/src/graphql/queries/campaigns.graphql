@@ -1,0 +1,83 @@
+query Campaigns($gameId: ID!) {
+  campaigns(gameId: $gameId) {
+    id
+    name
+    status
+    characterCount
+    sessionCount
+  }
+}
+
+query Campaign($id: ID!, $gameId: ID!) {
+  campaign(id: $id, gameId: $gameId) {
+    id
+    name
+    status
+    sessionCount
+    characters {
+      id
+      name
+      status
+      ownerPlayerId
+    }
+  }
+}
+
+query CampaignSessionState($id: ID!, $gameId: ID!) {
+  campaignSessionState(id: $id, gameId: $gameId) {
+    id
+    name
+    status
+    sessionId
+    currentLocation {
+      id
+      name
+      locationType
+      connections {
+        toLocation {
+          id
+          name
+          locationType
+          status
+          parentId
+          sceneCount
+          childCount
+        }
+        direction
+      }
+    }
+    characters {
+      id
+      name
+      status
+      ownerPlayerId
+    }
+  }
+}
+
+query SessionLauncher($campaignId: ID!, $gameId: ID!) {
+  sessionLauncher(campaignId: $campaignId, gameId: $gameId) {
+    campaignId
+    campaignName
+    status
+    sessionCount
+    characters {
+      id
+      name
+      status
+      ownerPlayerId
+    }
+  }
+}
+
+query SessionSummary($sessionId: ID!, $gameId: ID!) {
+  sessionSummary(sessionId: $sessionId, gameId: $gameId) {
+    sessionId
+    beatsDiscoveredCount
+    entitiesRevealedCount
+    finalLocation {
+      id
+      name
+    }
+  }
+}

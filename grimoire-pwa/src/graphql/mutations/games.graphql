@@ -1,0 +1,6 @@
+mutation CreateGame($input: CreateGameInput!) {
+  createGame(input: $input) {
+    id
+    status
+  }
+}

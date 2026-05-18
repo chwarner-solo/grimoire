@@ -1,0 +1,57 @@
+query Locations($gameId: ID!) {
+  locations(gameId: $gameId) {
+    id
+    name
+    locationType
+    status
+    parentId
+    sceneCount
+    childCount
+  }
+}
+
+query Location($id: ID!, $gameId: ID!) {
+  location(id: $id, gameId: $gameId) {
+    id
+    name
+    locationType
+    status
+    parentLocation {
+      id
+      name
+      locationType
+      status
+      parentId
+      sceneCount
+      childCount
+    }
+    scenes {
+      id
+      name
+    }
+    connections {
+      toLocation {
+        id
+        name
+        locationType
+        status
+        parentId
+        sceneCount
+        childCount
+      }
+      direction
+    }
+  }
+}
+
+query ActiveLocations($gameId: ID!) {
+  activeLocations(gameId: $gameId) {
+    id
+    name
+    locationType
+    status
+    parentId
+    sceneCount
+    childCount
+  }
+}

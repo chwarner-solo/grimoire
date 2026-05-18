@@ -1,0 +1,47 @@
+query Factions($gameId: ID!) {
+  factions(gameId: $gameId) {
+    id
+    name
+    status
+    playerVisible
+    memberCount
+    standingLevelCount
+    allies {
+      id
+      name
+    }
+    enemies {
+      id
+      name
+    }
+  }
+}
+
+query Faction($id: ID!, $gameId: ID!) {
+  faction(id: $id, gameId: $gameId) {
+    id
+    name
+    status
+    playerVisible
+    members {
+      npc {
+        id
+        name
+      }
+      rank
+    }
+    standingLevels {
+      ordinal
+      name
+      threshold
+    }
+    allies {
+      id
+      name
+    }
+    enemies {
+      id
+      name
+    }
+  }
+}

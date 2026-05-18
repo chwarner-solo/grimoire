@@ -1,0 +1,41 @@
+mutation CreateNPC($input: CreateNPCInput!) {
+  createNPC(input: $input) {
+    id
+    status
+  }
+}
+
+mutation UpdateNPCContent($input: UpdateNPCContentInput!) {
+  updateNPCContent(input: $input) {
+    id
+    status
+  }
+}
+
+mutation ActivateNPC($input: NPCLifecycleInput!) {
+  activateNPC(input: $input) {
+    id
+    status
+  }
+}
+
+mutation ArchiveNPC($input: NPCLifecycleInput!) {
+  archiveNPC(input: $input) {
+    id
+    status
+  }
+}
+
+mutation CreatePlayerCharacter($input: CreatePlayerCharacterInput!) {
+  createPlayerCharacter(input: $input) {
+    id
+    status
+  }
+}
+
+mutation CreateMacGuffin($input: CreateMacGuffinInput!) {
+  createMacGuffin(input: $input) {
+    id
+    status
+  }
+}

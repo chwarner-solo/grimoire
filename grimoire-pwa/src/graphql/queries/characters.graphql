@@ -1,0 +1,35 @@
+query Npcs($gameId: ID!, $excludeArchived: Boolean) {
+  npcs(gameId: $gameId, excludeArchived: $excludeArchived) {
+    id
+    name
+    status
+    playerVisible
+  }
+}
+
+query Npc($id: ID!, $gameId: ID!) {
+  npc(id: $id, gameId: $gameId) {
+    id
+    name
+    status
+    playerVisible
+    description
+    playerDescription
+    factionMemberships {
+      faction {
+        id
+        name
+      }
+      rank
+    }
+  }
+}
+
+query PlayerCharacters($gameId: ID!) {
+  playerCharacters(gameId: $gameId) {
+    id
+    name
+    status
+    ownerPlayerId
+  }
+}

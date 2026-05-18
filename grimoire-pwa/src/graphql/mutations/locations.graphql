@@ -1,0 +1,34 @@
+mutation CreateLocation($input: CreateLocationInput!) {
+  createLocation(input: $input) {
+    id
+    status
+  }
+}
+
+mutation ActivateLocation($input: LocationLifecycleInput!) {
+  activateLocation(input: $input) {
+    id
+    status
+  }
+}
+
+mutation AddScene($input: AddSceneInput!) {
+  addScene(input: $input) {
+    id
+    status
+  }
+}
+
+mutation ConnectLocations($input: ConnectLocationsInput!) {
+  connectLocations(input: $input) {
+    id
+    status
+  }
+}
+
+mutation ArchiveLocation($input: LocationLifecycleInput!) {
+  archiveLocation(input: $input) {
+    id
+    status
+  }
+}
